@@ -5,14 +5,15 @@ enum PageIdentifier: String {
 }
 
 struct ContentView: View {
+    @ObservedObject var appState = AppState()
     @State var pageShowing: PageIdentifier = .title
     
     var body: some View {
         switch pageShowing {
         case .title:
-            TitleView(pageShowing: $pageShowing)
+            TitleView(appState: appState, pageShowing: $pageShowing)
         case .learn:
-            LearnView()
+            LearnView(appState: appState)
         case .play:
             Text("Yet to come")
 //        default:

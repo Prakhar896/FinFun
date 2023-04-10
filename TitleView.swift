@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TitleView: View {
+    @ObservedObject var appState: AppState
     @Binding var pageShowing: PageIdentifier
     
     @State private var appDescAndNextButtonIsShowing = false
@@ -56,6 +57,10 @@ struct TitleView: View {
             }
         }
         .onAppear {
+            if appState.lessonsCompleted != 0 {
+                pageShowing = .learn
+                return
+            }
             withAnimation(.spring(blendDuration: 1.5)) {
                 appDescAndNextButtonIsShowing = true
                 titleAndIconOffsetDeduction = 30
@@ -67,6 +72,6 @@ struct TitleView: View {
 
 struct TitleView_Previews: PreviewProvider {
     static var previews: some View {
-        TitleView(pageShowing: .constant(.title))
+        TitleView(appState: AppState(), pageShowing: .constant(.title))
     }
 }

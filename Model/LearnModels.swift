@@ -11,14 +11,20 @@ enum LessonTypes: String {
     case fd = "Fixed Deposits", savings = "Savings", funds = "Managed Funds", insurance = "Insurance"
 }
 
-struct Lesson: Codable {
+struct UserProgress: Codable {
+    var lessons: [Lesson]
+}
+
+struct Lesson: Codable, Identifiable {
+    var id = UUID()
     var title: String
     var description: String
     var howItWorks: LessonHowItWorks
     var quiz: LessonQuiz
+    var completed: Bool = false
     
     static func loadDefaultLessons() -> [Lesson] {
-        let fixedDeposits = Lesson(
+        var fixedDeposits = Lesson(
             title: "Fixed Deposits",
             description: "Fixed deposits are tools provided by banks or other financial institutions which provide investors a higher rate of interest than a regular savings account until a given maturity date.",
             howItWorks: LessonHowItWorks(
@@ -41,6 +47,8 @@ struct Lesson: Codable {
                 ]
             )
         )
+        
+        fixedDeposits.completed = true
         
         return [fixedDeposits]
     }
@@ -67,6 +75,7 @@ struct LessonQuizQuestion: Codable {
     var options: [String]
     
     var correctOption: Int
+    var userSelectedOption: Int?
     var correctOptionString: String? {
         if options.isEmpty || correctOption > (options.count - 1) {
             return nil
