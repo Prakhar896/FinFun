@@ -1,53 +1,22 @@
 import SwiftUI
 
+enum PageIdentifier: String {
+    case title = "Title", learn = "Learn", play = "Play"
+}
+
 struct ContentView: View {
-    @State private var appDescAndNextButtonIsShowing = false
-    @State private var titleAndIconOffsetDeduction = 0.0
+    @State var pageShowing: PageIdentifier = .title
     
     var body: some View {
-        VStack(spacing: 50) {
-            VStack { // Welcome and Icon
-                Image("UpscaledIcon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .cornerRadius(20)
-                Text("Welcome to\nFinFun!")
-                    .font(.largeTitle.weight(.heavy))
-                    .multilineTextAlignment(.center)
-            }
-            .offset(x: 0, y: 30 - titleAndIconOffsetDeduction)
-            
-            if appDescAndNextButtonIsShowing {
-                VStack { // A bit of explanatory text
-                    Text("FinFun is a fun and interactive app where you can learn some basic personal finance methods in a gamified manner! It was designed to be a stepping stone for all teenagers or young adults out there who may be starting to manage their own finances as they grow older.")
-                        .padding()
-                    Text("This app has two sections: Learn, and Play. In Learn, you will pick up some basic personal finance knowledge to play the game in Play. You will find out what Play involves yourself!")
-                        .padding()
-                }
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                
-                Button { // Next Button
-                    print("Tapped!")
-                } label: {
-                    HStack {
-                        Text("Next")
-                            .bold()
-                        Image(systemName: "arrow.right")
-                    }
-                    .foregroundColor(.white)
-                    .padding()
-                }
-                .background(.blue)
-                .cornerRadius(10)
-            }
-        }
-        .onAppear {
-            withAnimation(.spring(blendDuration: 1.5)) {
-                appDescAndNextButtonIsShowing = true
-                titleAndIconOffsetDeduction = 30
-            }
+        switch pageShowing {
+        case .title:
+            TitleView(pageShowing: $pageShowing)
+        case .learn:
+            LearnView()
+        case .play:
+            Text("Yet to come")
+//        default:
+//            Text("Oops! Looks like you are caught in the middle of nowhere!\nPlease restart the app.")
         }
     }
 }
