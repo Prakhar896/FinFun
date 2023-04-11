@@ -6,7 +6,7 @@ enum PageIdentifier: String {
 
 struct ContentView: View {
     @ObservedObject var appState = AppState()
-    @State var pageShowing: PageIdentifier = .title
+    @State var pageShowing: PageIdentifier = .learn
     
     var body: some View {
         switch pageShowing {
