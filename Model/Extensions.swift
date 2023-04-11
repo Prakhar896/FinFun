@@ -38,6 +38,6 @@ extension Date {
 extension FileManager {
     static func getPlistDirectory() {
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-        print("Your expenses plist is at: \(documentsPath)")
+        print("Your plist directory is at: \(documentsPath)")
     }
 }

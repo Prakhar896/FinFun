@@ -11,6 +11,8 @@ class AppState: ObservableObject {
     // MARK: Learn Section
     @Published var lessons: [Lesson] {
         didSet {
+            print("Saving below lesson data to plist...")
+            print(lessons)
             AppState.saveLessonsToFile(lessons: lessons)
         }
     }
@@ -71,6 +73,8 @@ class AppState: ObservableObject {
             
             localLessonsCopy = Lesson.loadDefaultLessons()
         }
+        
+        AppState.saveLessonsToFile(lessons: localLessonsCopy ?? Lesson.loadDefaultLessons()) // idk why didSet property observer doesn't fire when set above, had to do it manually.
         
         if let currentLessonID = UserDefaults.standard.string(forKey: UserDefaults.getKeyString(.currentLessonID)) {
             currentLesson = localLessonsCopy?.filter({ $0.id == currentLessonID }).first ?? Lesson.loadDefaultLessons()[0]
