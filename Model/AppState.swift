@@ -14,6 +14,11 @@ class AppState: ObservableObject {
             AppState.saveLessonsToFile(lessons: lessons)
         }
     }
+    @Published var currentLesson: Lesson {
+        didSet {
+            UserDefaults.standard.set(currentLesson.id, forKey: UserDefaults.getKeyString(.currentLessonID))
+        }
+    }
     
     var lessonsCompleted: Int {
         var completed = 0
@@ -27,13 +32,6 @@ class AppState: ObservableObject {
     }
     var completedLearnCourse: Bool {
         lessonsCompleted == lessons.count
-    }
-    var currentLesson: Lesson {
-        if completedLearnCourse { // Finished entire course
-            return lessons[lessonsCompleted - 1] // Return last course of curriculum
-        } else {
-            return lessons[lessonsCompleted]
-        }
     }
     
     static func saveLessonsToFile(lessons: [Lesson]) {
@@ -63,10 +61,21 @@ class AppState: ObservableObject {
     
     init() {
         // Try loading lesson data from plist file, otherwise load default lessons
+        var localLessonsCopy: [Lesson]? = nil
         if let loadedLessonData = AppState.loadLessonsFromFile() {
             lessons = loadedLessonData
+            
+            localLessonsCopy = loadedLessonData
         } else {
             lessons = Lesson.loadDefaultLessons()
+            
+            localLessonsCopy = Lesson.loadDefaultLessons()
+        }
+        
+        if let currentLessonID = UserDefaults.standard.string(forKey: UserDefaults.getKeyString(.currentLessonID)) {
+            currentLesson = localLessonsCopy?.filter({ $0.id == currentLessonID }).first ?? Lesson.loadDefaultLessons()[0]
+        } else {
+            currentLesson = Lesson.loadDefaultLessons()[0]
         }
     }
 }

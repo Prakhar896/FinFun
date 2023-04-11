@@ -13,31 +13,51 @@ struct LearnView: View {
     var lessons: [Lesson] {
         appState.lessons
     }
-    var currentLesson: Lesson {
-        appState.currentLesson
-    }
     
     var body: some View {
         NavigationView {
             // Navigation
-            List {
-                Section {
+            ScrollView {
+                VStack(spacing: 0) {
                     ForEach(lessons) { lesson in
-                        HStack {
-                            Image(systemName: lesson.completed ? "checkmark.circle.fill": "circle")
-                                .foregroundColor(lesson.completed ? .green: .secondary)
-                            Text(lesson.title)
-                                .font(.subheadline)
+                        Button {
+                            // Switch to the page
+                            appState.currentLesson = lesson
+                        } label: {
+                            HStack {
+                                Image(systemName: lesson.completed ? "checkmark.circle.fill": "circle")
+                                    .foregroundColor(lesson.completed ? .green: .secondary)
+                                    .transition(.scale.combined(with: .opacity))
+                                Text(lesson.title)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                            }
+                            .padding(10)
                         }
+                        .padding(10)
+                        .background(appState.currentLesson.id == lesson.id ? Color.accentColor.opacity(0.1): .clear)
+                        .cornerRadius(10)
                     }
                 }
+                .padding(10)
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Learn")
             
             // Lesson Activity
-            Text(currentLesson.description)
-                .font(.title3)
+            ActivityView(appState: appState)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            print("Aint nothing gonna happen LMAO (but fr tho segue to play section")
+                        } label: {
+                            Text("Continue")
+                                .foregroundColor(appState.lessonsCompleted != appState.lessons.count ? .secondary: .blue)
+                        }
+                        .disabled(appState.lessonsCompleted != appState.lessons.count)
+                    }
+                }
         }
     }
 }

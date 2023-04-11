@@ -11,12 +11,8 @@ enum LessonTypes: String {
     case fd = "Fixed Deposits", savings = "Savings", funds = "Managed Funds", insurance = "Insurance"
 }
 
-struct UserProgress: Codable {
-    var lessons: [Lesson]
-}
-
 struct Lesson: Codable, Identifiable {
-    var id = UUID()
+    var id = UUID().uuidString
     var title: String
     var description: String
     var howItWorks: LessonHowItWorks
@@ -48,9 +44,13 @@ struct Lesson: Codable, Identifiable {
             )
         )
         
-        fixedDeposits.completed = true
+        fixedDeposits.completed = false
         
         return [fixedDeposits]
+    }
+    
+    static func firstIndexOfLesson(_ lesson: Lesson, in array: [Lesson]) -> Int {
+        return array.firstIndex(where: { $0.id == lesson.id }) ?? 0
     }
 }
 
