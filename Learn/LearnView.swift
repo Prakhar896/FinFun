@@ -23,8 +23,6 @@ struct LearnView: View {
                         Button {
                             // Switch to the page
                             appState.currentLesson = lesson
-                            print(lesson.id)
-                            print(appState.lessons)
                         } label: {
                             HStack {
                                 Image(systemName: lesson.completed ? "checkmark.circle.fill": "circle")
@@ -37,7 +35,7 @@ struct LearnView: View {
                             }
                             .padding(10)
                         }
-                        .padding(10)
+                        .padding(5)
                         .background(appState.currentLesson.id == lesson.id ? Color.accentColor.opacity(0.1): .clear)
                         .cornerRadius(10)
                     }
@@ -60,9 +58,6 @@ struct LearnView: View {
                         .disabled(appState.lessonsCompleted != appState.lessons.count)
                     }
                 }
-        }
-        .onAppear {
-            print(appState.currentLesson.id)
         }
     }
 }
