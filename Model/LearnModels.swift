@@ -28,7 +28,7 @@ struct Lesson: Codable, Identifiable {
                     LessonHowItWorksSection(
                         sectionTitle: "Normally...",
                         explanation: "Usually, regular savings accounts have an average interest rate of 0.20-1.00% APY (Annual Percentage Yield). This amounts to very little growth for your money over long periods of time. Fixed deposits can help with this, but do note that you cannot replace savings accounts with them.",
-                        imageName: "PoorGrowth"
+                        imageName: "calendar.badge.exclamationmark"
                     )
                 ]
             ),

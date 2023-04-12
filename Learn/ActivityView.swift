@@ -3,6 +3,9 @@ import SwiftUI
 struct ActivityView: View {
     @ObservedObject var appState: AppState
     
+    @State var lessonSectionAnimationDegrees = 0
+    @State var lessonSectionAnimationScale = 1.0
+    
     var lesson: Lesson {
         appState.currentLesson
     }
@@ -15,10 +18,7 @@ struct ActivityView: View {
             VStack {
                 // Description
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Description")
-                        .font(.title2.weight(.bold))
-                        .padding()
-                        .multilineTextAlignment(.leading)
+                    SectionHeader(title: "Description")
                     Text(lesson.description)
                         .multilineTextAlignment(.leading)
                         .font(.system(size: 18))
@@ -30,36 +30,7 @@ struct ActivityView: View {
                     SectionHeader(title: "How It Works")
                     
                     ForEach(lesson.howItWorks.sections, id: \.sectionTitle) { section in
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .padding(5)
-                                .foregroundColor(.white)
-                                .shadow(radius: 10)
-                            
-                            HStack {
-                                Image(section.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding()
-                                    .frame(width: 100, height: 100)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .leading) {
-                                    Text(section.sectionTitle)
-                                        .font(.title3.weight(.bold))
-                                        .padding()
-                                    Text(section.explanation)
-                                        .font(.system(size: 16))
-                                        .bold()
-                                        .padding()
-                                        .multilineTextAlignment(.leading)
-                                }
-                            }
-                            .padding()
-                        }
-                        .padding()
+                        LessonSection(section: section)
                     }
                 }
             }
