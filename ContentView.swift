@@ -14,6 +14,9 @@ struct ContentView: View {
             TitleView(appState: appState, pageShowing: $pageShowing)
         case .learn:
             LearnView(appState: appState)
+                .onAppear {
+                    appState.lessons = Lesson.loadDefaultLessons()
+                }
         case .play:
             Text("Yet to come")
 //        default:

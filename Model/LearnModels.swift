@@ -20,33 +20,9 @@ struct Lesson: Codable, Identifiable {
     var completed: Bool = false
     
     static func loadDefaultLessons() -> [Lesson] {
-        var fixedDeposits = Lesson(
-            title: "Fixed Deposits",
-            description: "Fixed deposits are tools provided by banks or other financial institutions which provide investors a higher rate of interest than a regular savings account until a given maturity date.",
-            howItWorks: LessonHowItWorks(
-                sections: [
-                    LessonHowItWorksSection(
-                        sectionTitle: "Normally...",
-                        explanation: "Usually, regular savings accounts have an average interest rate of 0.20-1.00% APY (Annual Percentage Yield). This amounts to very little growth for your money over long periods of time. Fixed deposits can help with this, but do note that you cannot replace savings accounts with them.",
-                        imageName: "calendar.badge.exclamationmark"
-                    )
-                ]
-            ),
-            quiz: LessonQuiz(
-                lessonTitle: "Fixed Deposits",
-                questions: [
-                    LessonQuizQuestion(
-                        question: "Is it a good idea to completely use fixed deposits?",
-                        options: ["Yes", "No"],
-                        correctOption: 0
-                    )
-                ]
-            )
-        )
-        
-        fixedDeposits.completed = false
-        
-        return [fixedDeposits]
+        return [
+            Content.fixedDeposits
+        ]
     }
     
     static func firstIndexOfLesson(_ lesson: Lesson, in array: [Lesson]) -> Int {
@@ -71,15 +47,31 @@ struct LessonQuiz: Codable {
 
 struct LessonQuizQuestion: Codable {
     var question: String
-    
     var options: [String]
-    
     var correctOption: Int
-    var userSelectedOption: Int?
+    var userSelectedOption: Int? = nil
+    
+    /// Returns a string which represents the correct answer based on the provided correctOption integer safely from the options array
     var correctOptionString: String? {
         if options.isEmpty || correctOption > (options.count - 1) {
             return nil
         }
         return options[correctOption]
+    }
+    
+    /// Requires userSelectedOption to have a value within the index range of the options array.
+    var userIsCorrect: Bool? {
+        if let userSelectedOption = userSelectedOption {
+            if userSelectedOption > (options.count - 1) { // Out of range
+                return nil
+            }
+            
+            if correctOptionString == options[userSelectedOption] {
+                return true
+            } else {
+                return false
+            }
+        }
+        return nil
     }
 }
