@@ -56,4 +56,47 @@ struct Content {
             ]
         )
     )
+    
+    static let stocks = Lesson(
+        title: "Stocks",
+        description: "A stock represents a share in the ownersgip of a company, including a claim on a company's earnings and assets. As a result, stockholders are partial owners of a publicly listed company.",
+        howItWorks: LessonHowItWorks(
+            sections: [
+                LessonHowItWorksSection(
+                    sectionTitle: "Private vs Public",
+                    explanation: "Generally, there are two types of companies: private and public. Companies whose names end with 'Pte. Ltd.' as you may have seen are private companies; their shares and related rights/obligations are not publicly listed.\n\nPublic companies on the other hand, such as Apple Inc., publicly list their shares for people to purchase on the market.",
+                    imageName: "globe.americas"
+                ),
+                LessonHowItWorksSection(
+                    sectionTitle: "Investing in stocks",
+                    explanation: "Usually, a percentage of a company is divided into multiple shares. Each share can be purchased on the market at a price. Your investment in company shares allows said company to grow and become more successful.\n\nMore buyers thus become interested in purchasing stocks of the comapny, causing the value of your share as well as the market value of the company to increase. When you see fit, you can then sell your shares to get a profit on your original investment.",
+                    imageName: "square.stack.3d.up"
+                ),
+                LessonHowItWorksSection(
+                    sectionTitle: "Demand & Supply",
+                    explanation: "If, for some reason, a company starts to seem less profitable, investors may quickly sell their stock before the company loses more market value. As a result, demand for shares of the company also drops, causing a decline in the company's market value, and vice versa if the company starts to seem more profitable.\n\nThis 'see-saw' of supply and demand is affected by several factors such as bad publicity, shifting costs of labour or new laws and policies.",
+                    imageName: "chart.line.uptrend.xyaxis"
+                )
+            ]
+        )
+    )
+    
+    static let insurance = Lesson(
+        title: "Insurance",
+        description: "Insurance is an arrangement a company takes on to provide a guarantee of compensation for a specific loss, damage or illness in return for payment of a premium on a regular basis. It is a common risk management tool used in personal finance.",
+        howItWorks: LessonHowItWorks(
+            sections: [
+                LessonHowItWorksSection(
+                    sectionTitle: "Uncertainty",
+                    explanation: "Several mishaps such as medical illnesses, car accidents or loss of property may occur at unknown points in your life. Many people look to insurance companies to be able to recover from/mitigate damages of these accidents.\n\nInsurance companies provide financial payouts or help in other forms when these accidents do happen in return for a premium you have to pay typically monthly or semi-annually.",
+                    imageName: "person.fill.questionmark"
+                ),
+                LessonHowItWorksSection(
+                    sectionTitle: "What's in it for them?",
+                    explanation: "This does sound like something too good to be true, and you're right!\n\nInsurance companies actually make profit based on probability. For example, before you purchase a health insurance policy from a company, the company will perform a mandatory health check-up to calculate the risk of you having a medical illness or emergency.\n\nThe price for the premium for the policy will be calculated accordingly; the more likely you are to fall sick, the higher the premium.",
+                    imageName: "banknote"
+                )
+            ]
+        )
+    )
 }

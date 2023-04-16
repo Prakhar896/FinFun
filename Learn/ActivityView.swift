@@ -46,6 +46,7 @@ struct ActivityView: View {
                                 if !appState.completedLearnCourse {
                                     appState.currentLesson = appState.lessons[lessonIndex + 1]
                                     value.scrollTo("ActivityViewTop", anchor: .top)
+                                    
                                 }
                             }
                         } label: {
