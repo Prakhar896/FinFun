@@ -100,3 +100,23 @@ struct Content {
         )
     )
 }
+
+struct FixedDeposit {
+    
+}
+
+struct Savings {
+    
+}
+
+struct Insurance {
+    
+}
+
+struct ManagedFund {
+    
+}
+
+struct Stocks {
+    
+}
