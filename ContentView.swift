@@ -6,7 +6,7 @@ enum PageIdentifier: String {
 
 struct ContentView: View {
     @ObservedObject var appState = AppState()
-    @State var pageShowing: PageIdentifier = .learn
+    @State var pageShowing: PageIdentifier = .title
     
     var body: some View {
         switch pageShowing {
@@ -15,6 +15,7 @@ struct ContentView: View {
         case .learn:
             LearnView(appState: appState)
                 .onAppear {
+                    #warning("Below are lines of code meant for debug phase only (they prevent data persistence). Remove before final submission.")
                     appState.lessons = Lesson.loadDefaultLessons()
                     appState.currentLesson = appState.lessons[0]
                 }
