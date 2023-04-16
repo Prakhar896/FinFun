@@ -16,6 +16,7 @@ struct ContentView: View {
             LearnView(appState: appState)
                 .onAppear {
                     appState.lessons = Lesson.loadDefaultLessons()
+                    appState.currentLesson = appState.lessons[0]
                 }
         case .play:
             Text("Yet to come")

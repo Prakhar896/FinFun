@@ -14,23 +14,51 @@ struct ActivityView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack {
-                // Description
-                VStack(alignment: .leading, spacing: 0) {
-                    SectionHeader(title: "Description")
-                    Text(lesson.description)
-                        .multilineTextAlignment(.leading)
-                        .font(.system(size: 18))
-                        .padding()
-                }
-                
-                // How It Works Section
-                VStack(alignment: .leading, spacing: 10) {
-                    SectionHeader(title: "How It Works")
+        ScrollViewReader { value in
+            ScrollView {
+                VStack {
+                    // Description
+                    VStack(alignment: .leading, spacing: 0) {
+                        SectionHeader(title: "Description")
+                        Text(lesson.description)
+                            .multilineTextAlignment(.leading)
+                            .font(.system(size: 18))
+                            .padding()
+                    }
+                    .id("ActivityViewTop")
                     
-                    ForEach(lesson.howItWorks.sections, id: \.sectionTitle) { section in
-                        LessonSection(section: section)
+                    // How It Works Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        SectionHeader(title: "How It Works")
+                        
+                        ForEach(lesson.howItWorks.sections, id: \.sectionTitle) { section in
+                            LessonSection(section: section)
+                        }
+                    }
+                    
+                    // Next lesson button
+                    VStack {
+                        Button {
+                            // update AppState to display next lesson
+                            withAnimation {
+                                appState.lessons[lessonIndex].completed = true
+                                
+                                if !appState.completedLearnCourse {
+                                    appState.currentLesson = appState.lessons[lessonIndex + 1]
+                                    value.scrollTo("ActivityViewTop", anchor: .top)
+                                }
+                            }
+                        } label: {
+                            Text(appState.completedLearnCourse ? "Click on 'Continue' at the top-right corner.": (lessonIndex + 1) == appState.lessons.count ? "Complete Course": "Next Lesson")
+                                .foregroundColor(.accentColor)
+                                .bold()
+                                .padding()
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .background(Color.accentColor.opacity(0.2))
+                        .cornerRadius(10)
+                        .padding()
+                        .disabled(appState.completedLearnCourse)
                     }
                 }
             }

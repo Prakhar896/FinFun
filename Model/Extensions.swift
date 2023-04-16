@@ -40,4 +40,17 @@ extension FileManager {
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
         print("Your plist directory is at: \(documentsPath)")
     }
+    
+    static func deletePlistFile(withName name: String) {
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        
+        let plistURL = documentsDirectory.appendingPathComponent("\(name).plist")
+        
+        do {
+            try FileManager.default.removeItem(at: plistURL)
+            print("Successfully deleted plist file: \(name).plist from documents directory.")
+        } catch {
+            print("Error deleting plist file '\(name).plist': \(error.localizedDescription)")
+        }
+    }
 }

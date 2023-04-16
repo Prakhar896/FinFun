@@ -11,8 +11,7 @@ class AppState: ObservableObject {
     // MARK: Learn Section
     @Published var lessons: [Lesson] {
         didSet {
-            print("Saving below lesson data to plist...")
-            print(lessons)
+            print("Updates made to lesson data; saving to plist...")
             AppState.saveLessonsToFile(lessons: lessons)
         }
     }
