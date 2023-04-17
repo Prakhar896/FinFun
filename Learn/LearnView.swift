@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LearnView: View {
     @ObservedObject var appState: AppState
+    @Binding var pageShowing: PageIdentifier
     
     var lessons: [Lesson] {
         appState.lessons
@@ -50,7 +51,7 @@ struct LearnView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            print("Aint nothing gonna happen LMAO (but fr tho segue to play section")
+                            pageShowing = .play
                         } label: {
                             Text("Continue")
                                 .foregroundColor(appState.lessonsCompleted != appState.lessons.count ? .secondary: .blue)
@@ -64,6 +65,6 @@ struct LearnView: View {
 
 struct LearnView_Previews: PreviewProvider {
     static var previews: some View {
-        LearnView(appState: AppState())
+        LearnView(appState: AppState(), pageShowing: .constant(.learn))
     }
 }

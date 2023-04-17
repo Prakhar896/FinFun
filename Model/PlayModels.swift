@@ -15,7 +15,8 @@ enum CareerGrowthOptions: String {
     case hard = "2% (Hard)", medium = "5% (Medium)", easy = "10% (Easy)"
 }
 
-struct Child {
+struct Child: Identifiable {
+    var id = UUID()
     var age: Int
     
     static func feesForChild(_ child: Child) -> Double {
@@ -33,7 +34,6 @@ struct Child {
 
 struct GameProfile {
     var name: String
-    var age: Int
     var monthlySalaryInThousands: Int
     var children: [Child]
     var monthlyExpenses: Double

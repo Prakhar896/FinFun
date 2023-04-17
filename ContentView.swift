@@ -13,14 +13,18 @@ struct ContentView: View {
         case .title:
             TitleView(appState: appState, pageShowing: $pageShowing)
         case .learn:
-            LearnView(appState: appState)
+            LearnView(appState: appState, pageShowing: $pageShowing)
                 .onAppear {
                     #warning("Below are lines of code meant for debug phase only (they prevent data persistence). Remove before final submission.")
                     appState.lessons = Lesson.loadDefaultLessons()
-                    appState.currentLesson = appState.lessons[0]
+                    
+                    // Set all lessons to completed
+                    for i in 0..<appState.lessons.count {
+                        appState.lessons[i].completed = true
+                    }
                 }
         case .play:
-            Text("Yet to come")
+            ProfileSetupView()
 //        default:
 //            Text("Oops! Looks like you are caught in the middle of nowhere!\nPlease restart the app.")
         }
