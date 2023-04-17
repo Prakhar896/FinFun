@@ -13,7 +13,6 @@ struct ProfileSetupView: View {
     @State var monthlyExpenses: Double = 0.0
     @State var careerGrowth: CareerGrowthOptions = .easy
     @State var children: [Child] = []
-    @State var childrenCount: Int = 0
     
     // Alert properties
     @State var alertIsPresented: Bool = false
@@ -143,7 +142,7 @@ struct ProfileSetupView: View {
         }
         
         let userProfile = GameProfile(name: name, monthlySalaryInThousands: GameProfile.salaryForOption(monthlySalary), children: children, monthlyExpenses: monthlyExpenses, careerGrowth: GameProfile.careerGrowthRate(for: careerGrowth))
-        
+        print("Segue to play screen now.")
     }
 
     func presentAlert(withTitle title: String, andMessage message: String) {

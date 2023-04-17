@@ -94,11 +94,8 @@ struct GameState {
     var realTimeElapsed: Double
     
     var timeLeftReadable: String {
-        let secondsInAYear = 365 * 24 * 60 * 60
-        let secondsInAMonth = 30.42 * 24 * 60 * 60
-        
-        let years = Int(floor(timeLeft / Double(secondsInAYear)))
-        let months = Int(floor((timeLeft - Double(years * secondsInAYear)) / (secondsInAMonth)))
+        let years = Int(floor(timeLeft / Double(GameState.secondsInAYear)))
+        let months = Int(floor((timeLeft - Double(years * GameState.secondsInAYear)) / (GameState.secondsInAMonth)))
         
         var readableString: String = ""
         if years == 1 {
@@ -117,4 +114,6 @@ struct GameState {
     }
     
     static let defaultTimeLimit: Double = 50 * 365 * 24 * 60 * 60
+    static let secondsInAYear = 365 * 24 * 60 * 60
+    static let secondsInAMonth = 30.42 * 24 * 60 * 60
 }
