@@ -67,6 +67,18 @@ struct GameProfile {
             return 10
         }
     }
+    
+    static func blankGameProfile() -> GameProfile {
+        return GameProfile(
+            name: "John Appleseed",
+            monthlySalaryInThousands: 50,
+            children: [
+                Child(age: 2)
+            ],
+            monthlyExpenses: 1000,
+            careerGrowth: 5
+        )
+    }
 }
 
 enum TransactionType {
@@ -102,7 +114,7 @@ class Transaction {
     }
 }
 
-class GameState {
+class GameState: ObservableObject {
     var userGameProfile: GameProfile
     @Published var balance: Double
     @Published var transactions: [Transaction]
@@ -156,7 +168,7 @@ class GameState {
         var newTransacts: [Transaction] = []
         
         // Get updates from LifeManager
-        var lmTransactions = lifeManager.checkForCharges(realTimeElapsed: realTimeElapsed)
+        let lmTransactions = lifeManager.checkForCharges(realTimeElapsed: realTimeElapsed)
         newTransacts.append(contentsOf: lmTransactions)
         
         // Check on life events

@@ -14,6 +14,16 @@ struct ProfileSetupView: View {
     @State var careerGrowth: CareerGrowthOptions = .easy
     @State var children: [Child] = []
     
+    var generatedGameProfile: GameProfile {
+        return GameProfile(
+            name: name,
+            monthlySalaryInThousands: GameProfile.salaryForOption(monthlySalary),
+            children: children,
+            monthlyExpenses: monthlyExpenses,
+            careerGrowth: GameProfile.careerGrowthRate(for: careerGrowth)
+        )
+    }
+    
     // Alert properties
     @State var alertIsPresented: Bool = false
     @State var alertTitle: String = ""
@@ -42,6 +52,7 @@ struct ProfileSetupView: View {
                             TextField("John Appleseed", text: $name)
                                 .multilineTextAlignment(.trailing)
                         }
+                        .padding([.vertical])
                         
                         // Monthly Expenses
                         HStack {
@@ -104,19 +115,24 @@ struct ProfileSetupView: View {
                     }
                     
                     Section {
-                        Button {
-                            // check values, create profile and segue to game screen
-                            completeButtonTapped()
+                        NavigationLink {
+                            PlayHomeView(
+                                gameState: GameState(userGameProfile: generatedGameProfile, balance: 0.0, timeLeft: GameState.defaultTimeLimit, realTimeElapsed: 0.0)
+                            )
+                            // Text("Hello World!")
                         } label: {
-                            Text("Complete")
-                                .bold()
+                            HStack {
+                                Text("Play!")
+                                    .foregroundColor(.accentColor)
+                                    .bold()
+                                    .padding([.horizontal])
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .foregroundColor(.accentColor)
-                        .background(Color.accentColor.opacity(0.2))
-                        .cornerRadius(10)
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines) == "")
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                     }
-                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
                 .navigationTitle("Game Profile")
                 .alert(alertTitle, isPresented: $alertIsPresented) {
@@ -135,21 +151,6 @@ struct ProfileSetupView: View {
         children.remove(atOffsets: offsets)
     }
     
-    func completeButtonTapped() {
-        if name.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-            presentAlert(withTitle: "Uh Oh!", andMessage: "Please enter a valid name for your profile!")
-            return
-        }
-        
-        let userProfile = GameProfile(name: name, monthlySalaryInThousands: GameProfile.salaryForOption(monthlySalary), children: children, monthlyExpenses: monthlyExpenses, careerGrowth: GameProfile.careerGrowthRate(for: careerGrowth))
-        
-        // services testing
-        print("hello here 1")
-        var lifeManager = LifeManager(salaryInThousands: GameProfile.salaryForOption(monthlySalary), monthlyExpenditure: monthlyExpenses, children: children)
-        print("hello reached here 2")
-        print(lifeManager.checkForCharges(realTimeElapsed: 0.1))
-    }
-
     func presentAlert(withTitle title: String, andMessage message: String) {
         alertTitle = title
         alertMessage = message

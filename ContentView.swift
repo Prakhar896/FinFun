@@ -6,7 +6,7 @@ enum PageIdentifier: String {
 
 struct ContentView: View {
     @ObservedObject var appState = AppState()
-    @State var pageShowing: PageIdentifier = .title
+    @State var pageShowing: PageIdentifier = .play
     
     var body: some View {
         switch pageShowing {
@@ -20,7 +20,7 @@ struct ContentView: View {
                     
                     // Set all lessons to completed
                     for i in 0..<appState.lessons.count {
-                        appState.lessons[i].completed = false
+                        appState.lessons[i].completed = true
                     }
                 }
         case .play:

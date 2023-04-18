@@ -40,23 +40,9 @@ class LifeEvent {
             timestamps.append(event.occursAt)
         }
         
-        while true {
-            var newTimeStamp = Double.random(in: 20.0...115.0)
-            
-            var passedCheck = true
-            for timestamp in timestamps {
-                if newTimeStamp < (timestamp - 10) && newTimeStamp > (timestamp + 10) {
-                    // check against other timestamps as well
-                    continue
-                } else {
-                    passedCheck = false
-                }
-            }
-            
-            if passedCheck {
-                return newTimeStamp
-            }
-        }
+        var newTimeStamp = Double.random(in: 20.0...115.0)
+        
+        return newTimeStamp
     }
     
     static func costForEvent(withEventType type: EventType) -> Int {
@@ -107,29 +93,6 @@ class LifeManager {
         self.salaryInThousands = salaryInThousands
         self.monthlyExpenditure = monthlyExpenditure
         self.children = children
-        
-        //        // Randomise and set-up 3 life events
-        //        let eventTypes: [EventType] = [.accident, .medical]
-        //        let targetTypes: [TargetParty] = [.player, .child]
-        //
-        //        var tempEvents: [LifeEvent] = []
-        //
-        //        for _ in 0...2 {
-        //            let event = eventTypes.randomElement() ?? .accident
-        //            let party = targetTypes.randomElement() ?? .player
-        //
-        //            tempEvents.append(
-        //                LifeEvent(
-        //                    title: event.rawValue,
-        //                    type: event,
-        //                    targetParty: party,
-        //                    occursAt: LifeEvent.safelyGenerateNewRandomTimestamp(generatedEvents: tempEvents),
-        //                    cost: LifeEvent.costForEvent(withEventType: event)
-        //                )
-        //            )
-        //        }
-        //
-        //        self.lifeEvents = tempEvents
     }
     
     func checkForCharges(realTimeElapsed: Double) -> [Transaction] {
@@ -170,26 +133,6 @@ class LifeManager {
                 )
             }
         }
-        
-//        // Check if any life events occur
-//        for eventIndex in 0..<lifeEvents.count {
-//            if !lifeEvents[eventIndex].occurred {
-//                if lifeEvents[eventIndex].occursAt < realTimeElapsed {
-//                    // Set life event has occurred to true
-//                    //                    lifeEvents[eventIndex].occurred = true
-//
-//                    charges.append(
-//                        Transaction(
-//                            title: "Life Event: \(lifeEvents[eventIndex].title)",
-//                            type: .lifeEvent,
-//                            posOrNeg: .negative,
-//                            quantity: Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type)),
-//                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased())."
-//                        )
-//                    )
-//                }
-//            }
-//        }
         
         return charges
     }
