@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Content {
+struct AppContent {
     // MARK: Default Lesson Data
     static let fixedDeposits = Lesson(
         title: "Fixed Deposits",
@@ -99,24 +99,4 @@ struct Content {
             ]
         )
     )
-}
-
-struct FixedDeposit {
-    
-}
-
-struct Savings {
-    
-}
-
-struct Insurance {
-    
-}
-
-struct ManagedFund {
-    
-}
-
-struct Stocks {
-    
 }

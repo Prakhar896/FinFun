@@ -20,10 +20,10 @@ struct Lesson: Codable, Identifiable {
     
     static func loadDefaultLessons() -> [Lesson] {
         return [
-            Content.insurance,
-            Content.fixedDeposits,
-            Content.stocks,
-            Content.managedFunds
+            AppContent.insurance,
+            AppContent.fixedDeposits,
+            AppContent.stocks,
+            AppContent.managedFunds
         ]
     }
     

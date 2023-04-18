@@ -10,8 +10,19 @@ import SwiftUI
 struct PlayHomeView: View {
     @StateObject var gameState: GameState
     
+    @State var showingIntro: Bool = true
+    
     var body: some View {
-        Text(gameState.timeLeftReadable)
+        ZStack {
+            switch showingIntro {
+            case true:
+                HomeIntroView(userProfile: gameState.userGameProfile, showingIntro: $showingIntro)
+            case false:
+                Text("Let the games begin.")
+            }
+        }
+            .navigationTitle("Play")
+            .navigationBarBackButtonHidden()
     }
 }
 
