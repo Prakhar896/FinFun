@@ -13,14 +13,25 @@ enum EventType: String {
     case accident = "Accident", medical = "Medical Emergency"
 }
 
-struct LifeEvent {
+class LifeEvent {
     var title: String
+    var type: EventType
     var targetParty: TargetParty
     var occursAt: Double // the timestamp at which it occurs (real time)
     var cost: Int
     
-    var occurred: Bool = false
+    @Published var occurred: Bool = false
     var description: String? = nil
+    
+    init(title: String, type: EventType, targetParty: TargetParty, occursAt: Double, cost: Int, occurred: Bool = false, description: String? = nil) {
+        self.title = title
+        self.type = type
+        self.targetParty = targetParty
+        self.occursAt = occursAt
+        self.cost = cost
+        self.occurred = occurred
+        self.description = description
+    }
     
     static func safelyGenerateNewRandomTimestamp(generatedEvents events: [LifeEvent]) -> Double {
         var timestamps: [Double] = []
@@ -83,6 +94,7 @@ struct LifeManager {
             tempEvents.append(
                 LifeEvent(
                     title: event.rawValue,
+                    type: event,
                     targetParty: party,
                     occursAt: LifeEvent.safelyGenerateNewRandomTimestamp(generatedEvents: tempEvents),
                     cost: LifeEvent.costForEvent(withEventType: event)
@@ -93,14 +105,64 @@ struct LifeManager {
         self.lifeEvents = tempEvents
     }
     
-    func checkForCharges(realTimeElapsed: Double, timeLeft: Double) -> [Transaction] {
+    func checkForCharges(realTimeElapsed: Double) -> [Transaction] {
         // Run every 0.1 seconds
         var charges: [Transaction] = []
         
-        // Issue salary
+        // Issue monthly charges
+        if realTimeElapsed.remainder(dividingBy: 2) == 0 {
+            // Salary charge
+            charges.append(
+                Transaction(
+                    title: "Monthly Salary",
+                    type: .salary,
+                    posOrNeg: .positive,
+                    quantity: Double(salaryInThousands * 10000)
+                )
+            )
+            
+            // Expenditure charge
+            charges.append(
+                Transaction(
+                    title: "Monthly Expenditure",
+                    type: .expenses,
+                    posOrNeg: .negative,
+                    quantity: monthlyExpenditure
+                )
+            )
+            
+            // School fees charges
+            for childIndex in 0..<children.count {
+                charges.append(
+                    Transaction(
+                        title: "School Fees for Child \(childIndex)",
+                        type: .schoolFees,
+                        posOrNeg: .negative,
+                        quantity: Child.feesForChild(children[childIndex])
+                    )
+                )
+            }
+        }
         
-        
-        
+        // Check if any life events occur
+        for eventIndex in 0..<lifeEvents.count {
+            if !lifeEvents[eventIndex].occurred {
+                if lifeEvents[eventIndex].occursAt < realTimeElapsed {
+                    // Set life event has occurred to true
+//                    lifeEvents[eventIndex].occurred = true
+                    
+                    charges.append(
+                        Transaction(
+                            title: "Life Event: \(lifeEvents[eventIndex].title)",
+                            type: .lifeEvent,
+                            posOrNeg: .negative,
+                            quantity: Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type)),
+                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased())."
+                        )
+                    )
+                }
+            }
+        }
         
         return charges
     }

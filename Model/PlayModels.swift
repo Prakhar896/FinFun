@@ -73,6 +73,7 @@ enum TransactionType {
     case managedFunds
     case stocks
     case schoolFees
+    case lifeEvent
 }
 
 enum PositiveOrNegative {

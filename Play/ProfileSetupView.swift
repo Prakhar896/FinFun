@@ -142,7 +142,12 @@ struct ProfileSetupView: View {
         }
         
         let userProfile = GameProfile(name: name, monthlySalaryInThousands: GameProfile.salaryForOption(monthlySalary), children: children, monthlyExpenses: monthlyExpenses, careerGrowth: GameProfile.careerGrowthRate(for: careerGrowth))
-        print("Segue to play screen now.")
+        
+        // services testing
+        print("hello here 1")
+        var lifeManager = LifeManager(salaryInThousands: GameProfile.salaryForOption(monthlySalary), monthlyExpenditure: monthlyExpenses, children: children)
+        print("hello reached here 2")
+        print(lifeManager.checkForCharges(realTimeElapsed: 0.1))
     }
 
     func presentAlert(withTitle title: String, andMessage message: String) {
