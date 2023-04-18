@@ -15,9 +15,14 @@ enum CareerGrowthOptions: String {
     case hard = "2% (Hard)", medium = "5% (Medium)", easy = "10% (Easy)"
 }
 
-struct Child: Identifiable {
+class Child: Identifiable {
     var id = UUID()
-    var age: Int
+    @Published var age: Int
+    
+    init(id: UUID = UUID(), age: Int) {
+        self.id = id
+        self.age = age
+    }
     
     static func feesForChild(_ child: Child) -> Double {
         if child.age <= 10 {
@@ -74,25 +79,38 @@ enum TransactionType {
     case stocks
     case schoolFees
     case lifeEvent
+    case initialDeposit
 }
 
 enum PositiveOrNegative {
     case positive, negative
 }
 
-struct Transaction {
+class Transaction {
     var title: String
     var type: TransactionType
     var posOrNeg: PositiveOrNegative
     var quantity: Double
     var description: String? = nil
+    
+    init(title: String, type: TransactionType, posOrNeg: PositiveOrNegative, quantity: Double, description: String? = nil) {
+        self.title = title
+        self.type = type
+        self.posOrNeg = posOrNeg
+        self.quantity = quantity
+        self.description = description
+    }
 }
 
-struct GameState {
+class GameState {
     var userGameProfile: GameProfile
-    var balance: Double
-    var timeLeft: Double // this is in seconds
-    var realTimeElapsed: Double
+    @Published var balance: Double
+    @Published var transactions: [Transaction]
+    @Published var timeLeft: Double // this is in seconds
+    @Published var realTimeElapsed: Double
+    
+    @Published var lifeEvents: [LifeEvent]
+    @Published var lifeManager: LifeManager
     
     var timeLeftReadable: String {
         let years = Int(floor(timeLeft / Double(GameState.secondsInAYear)))
@@ -114,7 +132,70 @@ struct GameState {
         return readableString
     }
     
+    init(userGameProfile: GameProfile, balance: Double, timeLeft: Double, realTimeElapsed: Double) {
+        self.userGameProfile = userGameProfile
+        self.balance = balance
+        self.transactions = [
+            Transaction(
+                title: "Initial Deposit",
+                type: .initialDeposit,
+                posOrNeg: .positive,
+                quantity: 10000,
+                description: "This is an inital deposit for you to work with at the start of the game."
+            )
+        ]
+        self.timeLeft = timeLeft
+        self.realTimeElapsed = realTimeElapsed
+        
+        self.lifeEvents = LifeEvent.setupEventsForPlay(playerHasChildren: !userGameProfile.children.isEmpty)
+        self.lifeManager = LifeManager(salaryInThousands: userGameProfile.monthlySalaryInThousands, monthlyExpenditure: userGameProfile.monthlyExpenses, children: userGameProfile.children)
+    }
+    
+    func unitTimeDidElapse() {
+        // Update all services and apply transactions
+        var newTransacts: [Transaction] = []
+        
+        // Get updates from LifeManager
+        var lmTransactions = lifeManager.checkForCharges(realTimeElapsed: realTimeElapsed)
+        newTransacts.append(contentsOf: lmTransactions)
+        
+        // Check on life events
+        for eventIndex in 0..<lifeEvents.count {
+            if !lifeEvents[eventIndex].occurred {
+                if lifeEvents[eventIndex].occursAt < realTimeElapsed {
+                    // Set life event has occurred to true
+                    lifeEvents[eventIndex].occurred = true
+                    
+                    newTransacts.append(
+                        Transaction(
+                            title: "Life Event: \(lifeEvents[eventIndex].title)",
+                            type: .lifeEvent,
+                            posOrNeg: .negative,
+                            quantity: Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type)),
+                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased())."
+                        )
+                    )
+                }
+            }
+        }
+    }
+    
+    static func timeLeftDeductionRatePerPointOneSecond(gameDuration: Double) -> Double {
+        return round(defaultTimeLimit / gameDuration / 10 * 1000) / 1000 // round to 3dp
+    }
+    
     static let defaultTimeLimit: Double = 50 * 365 * 24 * 60 * 60
     static let secondsInAYear = 365 * 24 * 60 * 60
     static let secondsInAMonth = 30.42 * 24 * 60 * 60
 }
+
+
+#warning("put below on view struct later")
+//var occurredLifeEvents: [LifeEvent] {
+//    var events: [LifeEvent] = []
+//    for lifeEvent in lifeEvents {
+//        if lifeEvent.occurred {
+//            events.append(lifeEvent)
+//        }
+//    }
+//}

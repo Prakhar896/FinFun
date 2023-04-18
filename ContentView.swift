@@ -20,7 +20,7 @@ struct ContentView: View {
                     
                     // Set all lessons to completed
                     for i in 0..<appState.lessons.count {
-                        appState.lessons[i].completed = true
+                        appState.lessons[i].completed = false
                     }
                 }
         case .play:
