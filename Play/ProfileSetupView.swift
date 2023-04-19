@@ -14,6 +14,9 @@ struct ProfileSetupView: View {
     @State var careerGrowth: CareerGrowthOptions = .easy
     @State var children: [Child] = []
     
+    @FocusState var nameIsFocused: Bool
+    @FocusState var expensesIsFocused: Bool
+    
     var generatedGameProfile: GameProfile {
         return GameProfile(
             name: name,
@@ -51,6 +54,7 @@ struct ProfileSetupView: View {
                             Text("Name:")
                             TextField("John Appleseed", text: $name)
                                 .multilineTextAlignment(.trailing)
+                                .focused($nameIsFocused)
                         }
                         .padding([.vertical])
                         
@@ -60,6 +64,7 @@ struct ProfileSetupView: View {
                             TextField("For e.g, $2000", value: $monthlyExpenses, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
+                                .focused($expensesIsFocused)
                         }
                         
                         // Monthly Salary
@@ -139,6 +144,16 @@ struct ProfileSetupView: View {
                     Button("OK", role: .cancel) { alertIsPresented = false }
                 } message: {
                     Text(alertMessage)
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        
+                        Button("Done") {
+                            nameIsFocused = false
+                            expensesIsFocused = false
+                        }
+                    }
                 }
             }
         } else {

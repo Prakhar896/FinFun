@@ -45,7 +45,7 @@ struct HomeIntroView: View {
                 }
             
             VStack {
-                Text("Your aim is to make as much money as possible within 50 years (2 minutes in your dimensions' time) with the various finance options available to grow your assets.")
+                Text("Your aim is to make as much money as possible within 50 years (2 minutes in your dimensions' time)with the various finance options available to grow your assets.")
                 Text("Whether you have won this game of life will be determined at the end.\nFor now, all you have to do is start your venture into the unknown.")
                     .padding(.bottom, 50)
             }
