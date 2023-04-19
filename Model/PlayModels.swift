@@ -228,22 +228,21 @@ class GameState: ObservableObject {
                     
                     // Check if covered by insurance
                     var eventCost: Double = Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type))
-                    var coveredByInsurance: Bool = false
                     if insuranceManager.policyPurchased {
                         if insuranceManager.requestInsurancePayout(forLifeEvent: lifeEvents[eventIndex]) {
                             // all costs are paid for by insurance policy
                             eventCost = 0.0
-                            coveredByInsurance = true
+                            lifeEvents[eventIndex].coveredByInsurance = true
                         }
                     }
                     
                     newTransacts.append(
                         Transaction(
-                            title: "Life Event: \(lifeEvents[eventIndex].title) \(coveredByInsurance ? "(Covered by Insurance)": "")",
+                            title: "Life Event: \(lifeEvents[eventIndex].title) \(lifeEvents[eventIndex].coveredByInsurance ? "(Covered by Insurance)": "")",
                             type: .lifeEvent,
                             posOrNeg: .negative,
                             quantity: eventCost,
-                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased()). \(coveredByInsurance ? "All costs for this life event were covered by your purchased insurance policy.": "")"
+                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased()). \(lifeEvents[eventIndex].coveredByInsurance ? "All costs for this life event were covered by your purchased insurance policy.": "")"
                         )
                     )
                 }

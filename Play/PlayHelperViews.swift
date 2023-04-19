@@ -60,8 +60,35 @@ struct TransactionView: View {
     }
 }
 
+@available(iOS 16, *)
 struct LifeEventView: View {
+    var lifeEvent: LifeEvent
+    
+    var insuranceText: String {
+        if lifeEvent.coveredByInsurance {
+            return " (Covered by Insurance)"
+        } else {
+            return ""
+        }
+    }
+    
     var body: some View {
-        Text("hello, its me.")
+        HStack {
+            HStack(spacing: 15) {
+                Image(systemName: lifeEvent.type == .accident ? "exclamationmark.triangle": "cross.case")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                Text("\(lifeEvent.title) experienced by \(lifeEvent.targetParty.rawValue.lowercased())" + insuranceText)
+                    .font(.system(size: 17).bold())
+            }
+            
+            Spacer()
+            
+            Text(lifeEvent.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))
+                .foregroundColor(lifeEvent.coveredByInsurance ? .yellow: .red)
+                .font(.system(size: 17).bold())
+        }
+        .padding(5)
     }
 }

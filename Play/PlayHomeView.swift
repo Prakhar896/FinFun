@@ -37,6 +37,8 @@ struct PlayHomeView: View {
             }
         }
         
+        events = events.sorted(by: { $0.occursAt > $1.occursAt })
+        
         return events
     }
     
@@ -83,7 +85,7 @@ struct PlayHomeView: View {
                                 .multilineTextAlignment(.center)
                         } else {
                             ForEach(occurredLifeEvents) { event in
-                                Text(event.title + " occurred.")
+                                LifeEventView(lifeEvent: event)
                             }
                         }
                     } header: {

@@ -20,6 +20,7 @@ class LifeEvent: Identifiable {
     var targetParty: TargetParty
     var occursAt: Double // the timestamp at which it occurs (real time)
     var cost: Int
+    var coveredByInsurance: Bool = false
     
     @Published var occurred: Bool = false
     var description: String? = nil
@@ -49,9 +50,9 @@ class LifeEvent: Identifiable {
     
     static func costForEvent(withEventType type: EventType) -> Int {
         if type == .accident {
-            return [2000, 3000, 4000, 5000].randomElement()!
+            return [10000, 12000, 14000, 16000, 18000, 20000].randomElement()!
         } else if type == .medical {
-            return [6000, 7000, 8000, 9000, 10000].randomElement()!
+            return [30000, 35000, 40000, 45000, 50000, 55000].randomElement()!
         } else {
             return 5000
         }
