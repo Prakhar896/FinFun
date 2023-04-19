@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileSetupView: View {
-    @State var name: String = ""
+    @State var name: String = "Prakhar"
     @State var monthlySalary: SalaryOptions = .easy
     @State var monthlyExpenses: Double = 0.0
     @State var careerGrowth: CareerGrowthOptions = .easy

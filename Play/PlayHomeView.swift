@@ -10,7 +10,7 @@ import SwiftUI
 struct PlayHomeView: View {
     @StateObject var gameState: GameState
     
-    @State var showingIntro: Bool = true
+    @State var showingIntro: Bool = false
     
     var occurredLifeEvents: [LifeEvent] {
         var events: [LifeEvent] = []
@@ -65,8 +65,7 @@ struct PlayHomeView: View {
                                 .multilineTextAlignment(.center)
                         } else {
                             ForEach(gameState.transactions) { transaction in
-                                // transaction view here
-                                Text("Placeholder for transaction: \(transaction.title)")
+                                TransactionView(transaction: transaction)
                             }
                         }
                     } header: {
