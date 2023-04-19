@@ -140,7 +140,7 @@ struct PlayHomeView: View {
                     Text(alertMessage)
                 }
                 .sheet(isPresented: $optionsSheetIsPresented) {
-                    Text("Nothing to see here!")
+                    InvestmentView(gameState: gameState)
                 }
             }
         }

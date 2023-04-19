@@ -197,8 +197,6 @@ class GameState: ObservableObject {
         self.lifeManager = LifeManager(salaryInThousands: userGameProfile.monthlySalaryInThousands, monthlyExpenditure: userGameProfile.monthlyExpenses, careerGrowthRate: userGameProfile.careerGrowth, children: userGameProfile.children)
         
         self.insuranceManager = InsuranceManager()
-        let premiumCost = self.insuranceManager.purchasePolicy(timeLeftSeconds: GameState.defaultTimeLimit, forYears: 50, realTimeElapsed: realTimeElapsed)
-        print(premiumCost)
     }
     
     func unitTimeDidElapse() {
