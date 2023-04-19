@@ -115,9 +115,9 @@ class LifeManager {
         }
         
         // Issue monthly charges
-        var realRealTimeElapsed = realTimeElapsed * 10
+        let realRealTimeElapsed = realTimeElapsed * 10
         if realRealTimeElapsed.remainder(dividingBy: 2) <= 0 {
-            var yearsPassed = Int((realTimeElapsed * (GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) / Double(GameState.secondsInAYear))).rounded(.down))
+            let yearsPassed = Int((realTimeElapsed * (GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) / Double(GameState.secondsInAYear))).rounded(.down))
             
             // Salary charge
             charges.append(
@@ -161,5 +161,99 @@ class LifeManager {
         let result = principal * Double(truncating: pow(Decimal(1 + careerGrowthRatePercentage / 100), years) as NSNumber)
         
         return result
+    }
+}
+
+@available(iOS 16, *)
+class InsuranceManager {
+    @Published var policyPurchased: Bool = false
+    @Published var monthlyPremium: Double? = nil
+    @Published var policyExpiryTimestamp: Double? = nil
+    
+    var payouts: [String] = []
+    
+    init() {
+        self.policyPurchased = false
+        self.monthlyPremium = nil
+        self.policyExpiryTimestamp = nil
+    }
+    
+    /// Returns a monthly premium amount required to pay for the policy.
+    func purchasePolicy(timeLeftSeconds: Double, forYears years: Int, realTimeElapsed: Double) -> Double {
+        let premiumCost = InsuranceManager.calcPremiumFor(timeLeftSeconds: timeLeftSeconds, forYears: years)
+        
+        // update manager
+        policyPurchased = true
+        monthlyPremium = premiumCost
+        policyExpiryTimestamp = realTimeElapsed + (Double(years * GameState.secondsInAYear) / GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration))
+        
+        return premiumCost
+    }
+    
+    func checkForCharges(realTimeElapsed: Double) -> [Transaction] {
+        var charges: [Transaction] = []
+        
+        if policyPurchased {
+            if (policyExpiryTimestamp ?? GameState.defaultGameDuration) <= realTimeElapsed {
+                // expire the insurance policy
+                policyPurchased = false
+                monthlyPremium = nil
+                policyExpiryTimestamp = nil
+            } else {
+                // charge monthly premiums
+                let realRealTimeElapsed = realTimeElapsed * 10
+                if realRealTimeElapsed.remainder(dividingBy: 2) <= 0 {
+                    charges.append(
+                        Transaction(
+                            title: "Insurance Premium",
+                            type: .insurance,
+                            posOrNeg: .negative,
+                            quantity: monthlyPremium ?? 0.0,
+                            description: "You are charged for your purchased insurance policy monthly with the agreed upon premium amount until the insurance policy expires."
+                        )
+                    )
+                }
+            }
+        }
+        
+        return charges
+    }
+    
+    func expirePolicy() {
+        policyPurchased = false
+        monthlyPremium = nil
+        policyExpiryTimestamp = nil
+    }
+    
+    func requestInsurancePayout(forLifeEvent lifeEvent: LifeEvent) -> Bool {
+        if policyPurchased {
+            payouts.append("\(lifeEvent.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))) \(lifeEvent.title) experienced by \(lifeEvent.targetParty.rawValue.lowercased()).")
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    static func calcPremiumFor(timeLeftSeconds: Double, forYears years: Int) -> Double {
+        let yearsLeft = Int((timeLeftSeconds / Double(GameState.secondsInAYear)).rounded(.down))
+        
+        var premiumCost = 0.0
+        
+        if years > 40 {
+            premiumCost += 100
+        } else if years > 25 {
+            premiumCost += 600
+        } else if years > 5 {
+            premiumCost += 1000
+        }
+        if yearsLeft > 45 {
+            premiumCost += 300
+        } else if yearsLeft > 25 {
+            premiumCost += 1000
+        } else {
+            premiumCost += 1500
+        }
+        
+        return premiumCost
     }
 }
