@@ -24,6 +24,10 @@ struct TransactionView: View {
         return final
     }
     
+    @State var showingAlert = false
+    @State var alertTitle = ""
+    @State var alertMessage = ""
+    
     var body: some View {
         HStack {
             HStack(spacing: 15) {
@@ -42,5 +46,19 @@ struct TransactionView: View {
                 .font(.system(size: 18).bold())
         }
         .padding(5)
+        .onTapGesture {
+            alertTitle = transaction.title + amountText
+            alertMessage = transaction.description ?? "Looks like there's no description for this transaction. You gotta remember to keep your receipts!"
+            showingAlert = true
+        }
+        .alert(alertTitle, isPresented: $showingAlert) {
+            Text(alertMessage)
+        }
+    }
+}
+
+struct LifeEventView: View {
+    var body: some View {
+        Text("hello, its me.")
     }
 }

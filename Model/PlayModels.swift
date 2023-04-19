@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum SalaryOptions: String {
-    case hard = "$20K (Hard)", medium = "$50K (Medium)", easy = "$100K (Easy)"
+    case hard = "$10K (Hard)", medium = "$25K (Medium)", easy = "$50K (Easy)"
 }
 
 enum CareerGrowthOptions: String {
@@ -17,9 +18,9 @@ enum CareerGrowthOptions: String {
 
 class Child: Identifiable {
     var id = UUID()
-    @Published var age: Int
+    @Published var age: Double
     
-    init(id: UUID = UUID(), age: Int) {
+    init(id: UUID = UUID(), age: Double) {
         self.id = id
         self.age = age
     }
@@ -48,11 +49,11 @@ struct GameProfile {
     static func salaryForOption(_ option: SalaryOptions) -> Int {
         switch option {
         case .easy:
-            return 100
-        case .medium:
             return 50
+        case .medium:
+            return 25
         case .hard:
-            return 20
+            return 10
         }
     }
     
@@ -151,6 +152,8 @@ class GameState: ObservableObject {
     @Published var lifeEvents: [LifeEvent]
     @Published var lifeManager: LifeManager
     
+    @Published var gameEnded: Bool = false
+    
     var timeLeftReadable: String {
         let years = Int(floor(timeLeft / Double(GameState.secondsInAYear)))
         let months = Int(floor((timeLeft - Double(years * GameState.secondsInAYear)) / (GameState.secondsInAMonth)))
@@ -173,24 +176,33 @@ class GameState: ObservableObject {
     
     init(userGameProfile: GameProfile, balance: Double, timeLeft: Double, realTimeElapsed: Double) {
         self.userGameProfile = userGameProfile
-        self.balance = balance
-        self.transactions = [
-            Transaction(
-                title: "Initial Deposit",
-                type: .initialDeposit,
-                posOrNeg: .positive,
-                quantity: 10000,
-                description: "This is an inital deposit for you to work with at the start of the game."
-            )
-        ]
+        self.balance = balance + 10000
+        
+        let initialDeposit = Transaction(
+            title: "Initial Deposit",
+            type: .initialDeposit,
+            posOrNeg: .positive,
+            quantity: 10000,
+            description: "This is an inital deposit for you to work with at the start of the game."
+        )
+        self.transactions = [initialDeposit]
+        
         self.timeLeft = timeLeft
         self.realTimeElapsed = realTimeElapsed
         
         self.lifeEvents = LifeEvent.setupEventsForPlay(playerHasChildren: !userGameProfile.children.isEmpty)
-        self.lifeManager = LifeManager(salaryInThousands: userGameProfile.monthlySalaryInThousands, monthlyExpenditure: userGameProfile.monthlyExpenses, children: userGameProfile.children)
+        self.lifeManager = LifeManager(salaryInThousands: userGameProfile.monthlySalaryInThousands, monthlyExpenditure: userGameProfile.monthlyExpenses, careerGrowthRate: userGameProfile.careerGrowth, children: userGameProfile.children)
     }
     
     func unitTimeDidElapse() {
+        timeLeft = timeLeft - GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration)
+        realTimeElapsed += 0.1
+        
+        // Check if time over
+        if realTimeElapsed >= GameState.defaultGameDuration {
+            gameEnded = true
+        }
+        
         // Update all services and apply transactions
         var newTransacts: [Transaction] = []
         
@@ -203,7 +215,9 @@ class GameState: ObservableObject {
             if !lifeEvents[eventIndex].occurred {
                 if lifeEvents[eventIndex].occursAt < realTimeElapsed {
                     // Set life event has occurred to true
-                    lifeEvents[eventIndex].occurred = true
+                    withAnimation {
+                        lifeEvents[eventIndex].occurred = true
+                    }
                     
                     newTransacts.append(
                         Transaction(
@@ -217,6 +231,27 @@ class GameState: ObservableObject {
                 }
             }
         }
+        
+        withAnimation {
+            transactions.insert(contentsOf: newTransacts, at: 0)
+            applyTransactions(newTransacts)
+        }
+        
+        // Check if player becomes broke
+        if balance <= 0 {
+            gameEnded = true
+            // view struct can do checking of whether game ended because time over or broke
+        }
+    }
+    
+    func applyTransactions(_ transactions: [Transaction]) {
+        for transaction in transactions {
+            if transaction.posOrNeg == .positive {
+                balance += transaction.quantity
+            } else {
+                balance -= transaction.quantity
+            }
+        }
     }
     
     static func timeLeftDeductionRatePerPointOneSecond(gameDuration: Double) -> Double {
@@ -224,6 +259,7 @@ class GameState: ObservableObject {
     }
     
     static let defaultTimeLimit: Double = 50 * 365 * 24 * 60 * 60
+    static let defaultGameDuration: Double = 120.0
     static let secondsInAYear = 365 * 24 * 60 * 60
     static let secondsInAMonth = 30.42 * 24 * 60 * 60
 }
