@@ -47,13 +47,16 @@ struct TransactionView: View {
         }
         .padding(5)
         .onTapGesture {
-            alertTitle = transaction.title + amountText
+            alertTitle = "\(transaction.title) (\(amountText))"
             alertMessage = transaction.description ?? "Looks like there's no description for this transaction. You gotta remember to keep your receipts!"
             showingAlert = true
         }
         .alert(alertTitle, isPresented: $showingAlert) {
+            Button("OK") {}
+        } message: {
             Text(alertMessage)
         }
+
     }
 }
 

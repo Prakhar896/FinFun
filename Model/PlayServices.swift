@@ -147,7 +147,7 @@ class LifeManager {
                         type: .schoolFees,
                         posOrNeg: .negative,
                         quantity: Child.feesForChild(childrenCopy[childIndex]),
-                        description: "Your child has to go school, doesn't he?\nThe school fees progressively increment as you child grows older. You are charged for school fees for a child until said child moves out when he's 25."
+                        description: "Your child has to go to school, doesn't he?\n\nThe school fees progressively increment as you child grows older. You are charged for school fees for a child until said child moves out when he's 25."
                     )
                 )
             }
