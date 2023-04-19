@@ -20,6 +20,7 @@ struct PlayHomeView: View {
         }
     }
     @State var viewReloader = 0
+    @State var isPaused: Bool = false
     
     @State var timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
@@ -107,20 +108,22 @@ struct PlayHomeView: View {
                     }
                 }
                 .onReceive(timer) { firedDate in
-                    gameState.unitTimeDidElapse()
-                    
-                    if gameState.gameEnded {
-                        updateTimer("stop")
-                        if gameState.realTimeElapsed >= GameState.defaultGameDuration {
-                            // Game ended because of time over
-                            alertTitle = "Time's up!"
-                            alertMessage = "Looks like your time here is done! Let's see how you did..."
-                            alertIsPresented = true
-                        } else {
-                            // Game ended because of bankruptcy
-                            alertTitle = "Looks like you're outta cash!"
-                            alertMessage = "Oops! Your cash balance just hit zero, which means you're bankrupt and lost the game! Better luck next time!"
-                            alertIsPresented = true
+                    if !isPaused {
+                        gameState.unitTimeDidElapse()
+                        
+                        if gameState.gameEnded {
+                            updateTimer("stop")
+                            if gameState.realTimeElapsed >= GameState.defaultGameDuration {
+                                // Game ended because of time over
+                                alertTitle = "Time's up!"
+                                alertMessage = "Looks like your time here is done! Let's see how you did..."
+                                alertIsPresented = true
+                            } else {
+                                // Game ended because of bankruptcy
+                                alertTitle = "Looks like you're outta cash!"
+                                alertMessage = "Oops! Your cash balance just hit zero, which means you're bankrupt and lost the game! Better luck next time!"
+                                alertIsPresented = true
+                            }
                         }
                     }
                 }
@@ -138,6 +141,15 @@ struct PlayHomeView: View {
         .onAppear {
             if showingIntro {
                 updateTimer("stop")
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    isPaused.toggle()
+                } label: {
+                    Image(systemName: isPaused ? "play.fill": "pause.fill")
+                }
             }
         }
     }
