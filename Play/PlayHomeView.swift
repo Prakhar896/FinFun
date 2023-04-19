@@ -29,6 +29,9 @@ struct PlayHomeView: View {
     @State var alertTitle: String = ""
     @State var alertMessage: String = ""
     
+    // Finance options sheet
+    @State var optionsSheetIsPresented = false
+    
     var occurredLifeEvents: [LifeEvent] {
         var events: [LifeEvent] = []
         for lifeEvent in gameState.lifeEvents {
@@ -136,6 +139,9 @@ struct PlayHomeView: View {
                 } message: {
                     Text(alertMessage)
                 }
+                .sheet(isPresented: $optionsSheetIsPresented) {
+                    Text("Nothing to see here!")
+                }
             }
         }
         .navigationTitle("Play")
@@ -152,6 +158,16 @@ struct PlayHomeView: View {
                 } label: {
                     Image(systemName: isPaused ? "play.fill": "pause.fill")
                 }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    // segue to finance options screen
+                    optionsSheetIsPresented = true
+                } label: {
+                    Image(systemName: "square.grid.2x2")
+                }
+                .disabled(isPaused)
             }
         }
     }
