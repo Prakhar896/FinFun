@@ -123,11 +123,11 @@ class Transaction: Identifiable {
         case .expenses:
             return "cart"
         case .fd:
-            return "lock.fill"
+            return "lock"
         case .savings:
-            return "building.columns.fill"
+            return "building.columns"
         case .insurance:
-            return "shield.fill"
+            return "shield"
         case .managedFunds:
             return "person.3"
         case .stocks:
@@ -135,13 +135,14 @@ class Transaction: Identifiable {
         case .schoolFees:
             return "graduationcap"
         case .lifeEvent:
-            return "exclamationmark.triangle.fill"
+            return "exclamationmark.triangle"
         case .initialDeposit:
-            return "01.circle.fill"
+            return "01.circle"
         }
     }
 }
 
+@available(iOS 16, *)
 class GameState: ObservableObject {
     var userGameProfile: GameProfile
     @Published var balance: Double
@@ -151,6 +152,8 @@ class GameState: ObservableObject {
     
     @Published var lifeEvents: [LifeEvent]
     @Published var lifeManager: LifeManager
+    
+    @Published var insuranceManager: InsuranceManager
     
     @Published var gameEnded: Bool = false
     
@@ -192,6 +195,10 @@ class GameState: ObservableObject {
         
         self.lifeEvents = LifeEvent.setupEventsForPlay(playerHasChildren: !userGameProfile.children.isEmpty)
         self.lifeManager = LifeManager(salaryInThousands: userGameProfile.monthlySalaryInThousands, monthlyExpenditure: userGameProfile.monthlyExpenses, careerGrowthRate: userGameProfile.careerGrowth, children: userGameProfile.children)
+        
+        self.insuranceManager = InsuranceManager()
+        let premiumCost = self.insuranceManager.purchasePolicy(timeLeftSeconds: GameState.defaultTimeLimit, forYears: 50, realTimeElapsed: realTimeElapsed)
+        print(premiumCost)
     }
     
     func unitTimeDidElapse() {
@@ -219,18 +226,33 @@ class GameState: ObservableObject {
                         lifeEvents[eventIndex].occurred = true
                     }
                     
+                    // Check if covered by insurance
+                    var eventCost: Double = Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type))
+                    var coveredByInsurance: Bool = false
+                    if insuranceManager.policyPurchased {
+                        if insuranceManager.requestInsurancePayout(forLifeEvent: lifeEvents[eventIndex]) {
+                            // all costs are paid for by insurance policy
+                            eventCost = 0.0
+                            coveredByInsurance = true
+                        }
+                    }
+                    
                     newTransacts.append(
                         Transaction(
-                            title: "Life Event: \(lifeEvents[eventIndex].title)",
+                            title: "Life Event: \(lifeEvents[eventIndex].title) \(coveredByInsurance ? "(Covered by Insurance)": "")",
                             type: .lifeEvent,
                             posOrNeg: .negative,
-                            quantity: Double(LifeEvent.costForEvent(withEventType: lifeEvents[eventIndex].type)),
-                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased())."
+                            quantity: eventCost,
+                            description: "A life event occurred; \(lifeEvents[eventIndex].targetParty.rawValue.lowercased()) experienced a/an \(lifeEvents[eventIndex].type.rawValue.lowercased()). \(coveredByInsurance ? "All costs for this life event were covered by your purchased insurance policy.": "")"
                         )
                     )
                 }
             }
         }
+        
+        // Check on insurance charges
+        var insuranceCharges = insuranceManager.checkForCharges(realTimeElapsed: realTimeElapsed)
+        newTransacts.append(contentsOf: insuranceCharges)
         
         withAnimation {
             transactions.insert(contentsOf: newTransacts, at: 0)

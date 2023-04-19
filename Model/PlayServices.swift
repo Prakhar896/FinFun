@@ -85,6 +85,7 @@ class LifeEvent: Identifiable {
     }
 }
 
+@available(iOS 16, *)
 class LifeManager {
     @Published var salaryInThousands: Int // can change with career growth
     var monthlyExpenditure: Double

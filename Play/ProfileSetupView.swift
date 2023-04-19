@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileSetupView: View {
-    @State var name: String = "Prakhar"
+    @State var name: String = ""
     @State var monthlySalary: SalaryOptions = .easy
     @State var monthlyExpenses: Double = 0.0
     @State var careerGrowth: CareerGrowthOptions = .easy
@@ -144,6 +144,14 @@ struct ProfileSetupView: View {
                     Button("OK", role: .cancel) { alertIsPresented = false }
                 } message: {
                     Text(alertMessage)
+                }
+                .onAppear {
+                    #warning("Below code setups up a debug game profile by default for testing purposes. Remove before production.")
+                    name = "Prakhar"
+                    monthlyExpenses = 1000.0
+                    monthlySalary = .medium
+                    careerGrowth = .medium
+                    children = [Child(age: 13), Child(age: 20)]
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .keyboard) {
