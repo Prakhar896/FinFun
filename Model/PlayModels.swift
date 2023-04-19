@@ -98,7 +98,8 @@ enum PositiveOrNegative {
     case positive, negative
 }
 
-class Transaction {
+class Transaction: Identifiable {
+    var id = UUID()
     var title: String
     var type: TransactionType
     var posOrNeg: PositiveOrNegative
@@ -106,11 +107,37 @@ class Transaction {
     var description: String? = nil
     
     init(title: String, type: TransactionType, posOrNeg: PositiveOrNegative, quantity: Double, description: String? = nil) {
+        self.id = UUID()
         self.title = title
         self.type = type
         self.posOrNeg = posOrNeg
         self.quantity = quantity
         self.description = description
+    }
+    
+    static func imageName(forTransactionType transactionType: TransactionType) -> String {
+        switch transactionType {
+        case .salary:
+            return "banknote"
+        case .expenses:
+            return "cart"
+        case .fd:
+            return "lock.fill"
+        case .savings:
+            return "building.columns.fill"
+        case .insurance:
+            return "shield.fill"
+        case .managedFunds:
+            return "person.3"
+        case .stocks:
+            return "square.stack.3d.up"
+        case .schoolFees:
+            return "graduationcap"
+        case .lifeEvent:
+            return "exclamationmark.triangle.fill"
+        case .initialDeposit:
+            return "01.circle.fill"
+        }
     }
 }
 

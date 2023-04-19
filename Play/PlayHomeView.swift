@@ -57,7 +57,18 @@ struct PlayHomeView: View {
                     }
                     
                     Section {
-                        Text("Transactions will appear here.")
+                        if gameState.transactions.isEmpty {
+                            Text("No transactions have occurred yet. When they do occur, they will appear here.")
+                                .font(.headline.bold())
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .multilineTextAlignment(.center)
+                        } else {
+                            ForEach(gameState.transactions) { transaction in
+                                // transaction view here
+                                Text("Placeholder for transaction: \(transaction.title)")
+                            }
+                        }
                     } header: {
                         Text("Transactions")
                     }
