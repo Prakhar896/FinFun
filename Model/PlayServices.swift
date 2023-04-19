@@ -13,7 +13,8 @@ enum EventType: String {
     case accident = "Accident", medical = "Medical Emergency"
 }
 
-class LifeEvent {
+class LifeEvent: Identifiable {
+    var id: UUID = UUID()
     var title: String
     var type: EventType
     var targetParty: TargetParty
@@ -24,6 +25,7 @@ class LifeEvent {
     var description: String? = nil
     
     init(title: String, type: EventType, targetParty: TargetParty, occursAt: Double, cost: Int, occurred: Bool = false, description: String? = nil) {
+        self.id = UUID()
         self.title = title
         self.type = type
         self.targetParty = targetParty
@@ -40,7 +42,7 @@ class LifeEvent {
             timestamps.append(event.occursAt)
         }
         
-        var newTimeStamp = Double.random(in: 20.0...115.0)
+        let newTimeStamp = Double.random(in: 20.0...115.0)
         
         return newTimeStamp
     }

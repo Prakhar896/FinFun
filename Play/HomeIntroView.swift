@@ -58,7 +58,9 @@ struct HomeIntroView: View {
             }
                 
             Button {
-                showingIntro = false
+                withAnimation {
+                    showingIntro = false
+                }
             } label: {
                 Text("Begin")
                     .font(.system(size: 18).weight(.bold))

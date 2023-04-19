@@ -200,14 +200,3 @@ class GameState: ObservableObject {
     static let secondsInAYear = 365 * 24 * 60 * 60
     static let secondsInAMonth = 30.42 * 24 * 60 * 60
 }
-
-
-#warning("put below on view struct later")
-//var occurredLifeEvents: [LifeEvent] {
-//    var events: [LifeEvent] = []
-//    for lifeEvent in lifeEvents {
-//        if lifeEvent.occurred {
-//            events.append(lifeEvent)
-//        }
-//    }
-//}
