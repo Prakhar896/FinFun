@@ -107,7 +107,7 @@ struct PlayHomeView: View {
                             Text("Time Left:")
                                 .font(.system(size: 17))
                                 .padding(.leading)
-                            Text(gameState.timeLeftReadable)
+                            Text(gameState.gameEnded ? "Game Over": gameState.timeLeftReadable)
                                 .font(.system(size: 20).bold())
                                 .padding()
                                 .multilineTextAlignment(.leading)

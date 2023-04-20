@@ -155,6 +155,7 @@ class GameState: ObservableObject {
     
     @Published var insuranceManager: InsuranceManager
     @Published var fdManager: FDManager
+    @Published var stockManager: StockManager
     
     @Published var gameEnded: Bool = false
     
@@ -199,6 +200,7 @@ class GameState: ObservableObject {
         
         self.insuranceManager = InsuranceManager()
         self.fdManager = FDManager()
+        self.stockManager = StockManager(realTimeElapsed: realTimeElapsed)
     }
     
     func unitTimeDidElapse() {
@@ -250,11 +252,11 @@ class GameState: ObservableObject {
         }
         
         // Check on insurance charges
-        var insuranceCharges = insuranceManager.checkForCharges(realTimeElapsed: realTimeElapsed)
+        let insuranceCharges = insuranceManager.checkForCharges(realTimeElapsed: realTimeElapsed)
         newTransacts.append(contentsOf: insuranceCharges)
         
         // Check on fixed deposits
-        var fdCharges = fdManager.checkForCharges(realTimeElapsed: realTimeElapsed)
+        let fdCharges = fdManager.checkForCharges(realTimeElapsed: realTimeElapsed)
         newTransacts.append(contentsOf: fdCharges)
         
         withAnimation {
