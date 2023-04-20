@@ -12,12 +12,24 @@ struct InvestmentView: View {
     @ObservedObject var gameState: GameState
     
     @State var insurancePopupShowing: Bool = false
+    @State var fdPopupShowing: Bool = false
     
     var yearsLeftTillPolicyExpiry: Int? {
         if gameState.insuranceManager.policyPurchased {
-            var realTimeDurationToExpiry = (gameState.insuranceManager.policyExpiryTimestamp ?? 120.0) - gameState.realTimeElapsed
-            var fakeSeconds = GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) * realTimeDurationToExpiry
-            var fakeYears = fakeSeconds / Double(GameState.secondsInAYear)
+            let realTimeDurationToExpiry = (gameState.insuranceManager.policyExpiryTimestamp ?? 120.0) - gameState.realTimeElapsed
+            let fakeSeconds = GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) * realTimeDurationToExpiry
+            let fakeYears = fakeSeconds / Double(GameState.secondsInAYear)
+            return Int(fakeYears.rounded(.down))
+        } else {
+            return nil
+        }
+    }
+    
+    var yearsLeftTillFDExpiry: Int? {
+        if gameState.fdManager.fdPurchased {
+            let realTimeDurationToExpiry = (gameState.fdManager.fdExpiryTimestamp ?? 120.0) - gameState.realTimeElapsed
+            let fakeSeconds = GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) * realTimeDurationToExpiry
+            let fakeYears = fakeSeconds / Double(GameState.secondsInAYear)
             return Int(fakeYears.rounded(.down))
         } else {
             return nil
@@ -27,6 +39,7 @@ struct InvestmentView: View {
     var body: some View {
         NavigationView {
             List {
+                // Insurance
                 Section {
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
@@ -80,11 +93,51 @@ struct InvestmentView: View {
                     .background(.ultraThinMaterial)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                
+                // Fixed Deposits
+                Section {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Fixed Deposits")
+                                .font(.title.weight(.heavy))
+                            if gameState.fdManager.fdPurchased {
+                                Text("\(yearsLeftTillFDExpiry ?? 0) Years Left Till Policy Expiry")
+                                    .font(.subheadline)
+                            }
+                        
+                            Text("Allows you to make a long-term deposit with higher annual interest rates compared to savings accounts.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        
+                        Spacer()
+                        
+                        Button {
+                            // action code
+                            fdPopupShowing = true
+                        } label: {
+                            Text("Manage")
+                                .bold()
+                                .foregroundColor(.accentColor)
+                                .padding(10)
+                        }
+                        .background(Color.accentColor.opacity(0.2))
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                    }
+                    .padding(20)
+                    .background(.ultraThinMaterial)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
             .navigationTitle("Finance Options")
         }
         .sheet(isPresented: $insurancePopupShowing, content: {
             InsuranceInvestmentView(gameState: gameState, insuranceInvestmentViewIsPresenting: $insurancePopupShowing)
+        })
+        .sheet(isPresented: $fdPopupShowing, content: {
+            FDInvestmentView(gameState: gameState, fdPopupShowing: $fdPopupShowing)
         })
         .navigationTitle("Finance Options")
     }

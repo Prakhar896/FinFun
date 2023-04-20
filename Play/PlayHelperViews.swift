@@ -56,7 +56,7 @@ struct TransactionView: View {
         } message: {
             Text(alertMessage)
         }
-
+        
     }
 }
 
@@ -158,6 +158,8 @@ struct InsuranceInvestmentView: View {
                             .bold()
                     }
                     .padding()
+                } footer: {
+                    Text("Tip: The calculated premium above varies based on the current time left in the game and the chosen lifetime of the policy.")
                 }
                 
                 Section {
@@ -179,6 +181,119 @@ struct InsuranceInvestmentView: View {
                 }
             }
             .navigationTitle("Invest: Insurance Policy")
+        }
+    }
+}
+
+
+@available(iOS 16, *)
+struct FDInvestmentView: View {
+    @ObservedObject var gameState: GameState
+    @Binding var fdPopupShowing: Bool
+    
+    @FocusState var principalIsFocused: Bool
+    
+    @State var amount: Double = 5000.0
+    @State var years: Int = 2
+    @State var breakFDAlertPresented = false
+    
+    var yearsLeftTillFDExpiry: Int? {
+        if gameState.fdManager.fdPurchased {
+            let realTimeDurationToExpiry = (gameState.fdManager.fdExpiryTimestamp ?? 120.0) - gameState.realTimeElapsed
+            let fakeSeconds = GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration) * realTimeDurationToExpiry
+            let fakeYears = fakeSeconds / Double(GameState.secondsInAYear)
+            return Int(fakeYears.rounded(.down))
+        } else {
+            return nil
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                if !gameState.fdManager.fdPurchased {
+                    Section {
+                        // Inital amount
+                        HStack {
+                            Text("Initial Amount:")
+                            TextField("For e.g, $5000", value: $amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .focused($principalIsFocused)
+                        }
+                        .padding()
+                        
+                        // FD Lifetime
+                        HStack {
+                            Text("\(years) Years")
+                            Spacer()
+                            Stepper("Change FD lifetime span", value: $years, in: 2...49)
+                                .labelsHidden()
+                        }
+                        .padding()
+                    }
+                } else {
+                    Section {
+                        Text("\(yearsLeftTillFDExpiry ?? 0) Years To Fixed Deposit Expiry")
+                            .bold()
+                            .padding(20)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .multilineTextAlignment(.center)
+                    } header: {
+                        Text("Current Fixed Deposit Status")
+                    }
+                }
+                
+                Section {
+                    Button {
+                        // purchase policy
+                        if !gameState.fdManager.fdPurchased {
+                            var initial = gameState.fdManager.purchaseFD(withPrincipal: amount, forYears: years, realTimeElapsed: gameState.realTimeElapsed)
+                            withAnimation {
+                                gameState.transactions.insert(initial, at: 0)
+                                gameState.applyTransactions([initial])
+                            }
+                            fdPopupShowing = false
+                        } else {
+                            breakFDAlertPresented = true
+                        }
+                    } label: {
+                        Text(gameState.fdManager.fdPurchased ? "Break Fixed Deposit": "Purchase Fixed Deposit")
+                            .bold()
+                            .foregroundColor(gameState.fdManager.fdPurchased ? .red: .accentColor)
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .multilineTextAlignment(.center)
+                    }
+                    .background(gameState.fdManager.fdPurchased ? .red.opacity(0.2): Color.accentColor.opacity(0.2))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                }
+            }
+            .navigationTitle("Invest: Fixed Deposits")
+            .alert("Break fixed deposit?", isPresented: $breakFDAlertPresented) {
+                Button("Cancel", role: .cancel) {}
+                
+                Button("Break", role: .destructive) {
+                    var penalty = gameState.fdManager.breakFD()
+                    withAnimation {
+                        gameState.transactions.insert(penalty, at: 0)
+                        gameState.applyTransactions([penalty])
+                    }
+                    fdPopupShowing = false
+                }
+            } message: {
+                Text("Are you sure you'd like to break your fixed deposit? Do note that breaking an FD before its maturity date will cause you to incur a penalty fee.")
+            }
+            .toolbar {
+                ToolbarItem(placement: .keyboard) {
+                    HStack {
+                        Spacer()
+                        Button("Done") {
+                            principalIsFocused = true
+                        }
+                    }
+                }
+            }
         }
     }
 }

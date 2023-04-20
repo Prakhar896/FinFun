@@ -29,8 +29,9 @@ struct PlayHomeView: View {
     @State var alertTitle: String = ""
     @State var alertMessage: String = ""
     
-    // Finance options sheet
+    // Sheets
     @State var optionsSheetIsPresented = false
+    @State var allTransactionsSheetIsPresented = false
     
     var occurredLifeEvents: [LifeEvent] {
         var events: [LifeEvent] = []
@@ -43,6 +44,54 @@ struct PlayHomeView: View {
         events = events.sorted(by: { $0.occursAt > $1.occursAt })
         
         return events
+    }
+    
+    var totalIncome: Double {
+        var total = 0.0
+        for transaction in gameState.transactions {
+            if transaction.type == .salary {
+                total += transaction.quantity
+            }
+        }
+        return total
+    }
+    
+    var totalExpenditure: Double {
+        var total = 0.0
+        for transaction in gameState.transactions {
+            if transaction.type == .expenses {
+                total += transaction.quantity
+            }
+        }
+        return total
+    }
+    
+    var totalSchoolFees: Double? {
+        if gameState.userGameProfile.children.isEmpty {
+            return nil
+        } else {
+            var total = 0.0
+            for transaction in gameState.transactions {
+                if transaction.type == .schoolFees {
+                    total += transaction.quantity
+                }
+            }
+            return total
+        }
+    }
+    
+    var totalPremium: Double? {
+        if gameState.insuranceManager.policyPurchased {
+            var total = 0.0
+            for transaction in gameState.transactions {
+                if transaction.type == .insurance {
+                    total += transaction.quantity
+                }
+            }
+            return total
+        } else {
+            return nil
+        }
     }
     
     var body: some View {
@@ -95,6 +144,30 @@ struct PlayHomeView: View {
                         Text("Life Events")
                     }
                     
+                    Section {
+                        // Total Income view
+                        TransactionView(transaction: Transaction(title: "Total Income", type: .salary, posOrNeg: .positive, quantity: totalIncome, description: "This grouped transaction summarises the total amount of money you have made from your monthly salary."))
+                        
+                        // Total Expenditure View
+                        TransactionView(transaction: Transaction(title: "Total Expenditure", type: .expenses, posOrNeg: .negative, quantity: totalExpenditure, description: "This grouped transaction summarises the total amount of money you have spent in monthly expenditure."))
+                        
+                        if !gameState.userGameProfile.children.isEmpty {
+                            // School fees view
+                            TransactionView(transaction: Transaction(title: "Total School Fees", type: .schoolFees, posOrNeg: .negative, quantity: totalSchoolFees ?? 0.0, description: "This grouped transaction summarises the total amount of money you have spent on your children's school fees."))
+                        }
+                        
+                        if gameState.insuranceManager.policyPurchased {
+                            // Insurance Premium view
+                            TransactionView(transaction: Transaction(title: "Total Insurance Premium", type: .insurance, posOrNeg: .negative, quantity: totalPremium ?? 0.0, description: "This grouped transaction summarises the total amount of money spent on monthly insurance premiums."))
+                        }
+                    } header: {
+                        Text("Grouped Transactions")
+                    } footer: {
+                        Button("View All Transactions") {
+                            allTransactionsSheetIsPresented = true
+                        }
+                    }
+                    
                     // Transaction history
                     Section {
                         if gameState.transactions.isEmpty {
@@ -104,12 +177,14 @@ struct PlayHomeView: View {
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .multilineTextAlignment(.center)
                         } else {
-                            ForEach(gameState.transactions) { transaction in
+                            ForEach(gameState.transactions.filter({ transaction in
+                                return (transaction.type != .salary && transaction.type != .expenses && transaction.type != .schoolFees && transaction.type != .insurance)
+                            })) { transaction in
                                 TransactionView(transaction: transaction)
                             }
                         }
                     } header: {
-                        Text("Transactions")
+                        Text("Ungrouped Transactions")
                     }
                 }
                 .onReceive(timer) { firedDate in
@@ -118,6 +193,7 @@ struct PlayHomeView: View {
                         
                         if gameState.gameEnded {
                             updateTimer("stop")
+                            optionsSheetIsPresented = false
                             if gameState.realTimeElapsed >= GameState.defaultGameDuration {
                                 // Game ended because of time over
                                 alertTitle = "Time's up!"
@@ -141,6 +217,16 @@ struct PlayHomeView: View {
                 }
                 .sheet(isPresented: $optionsSheetIsPresented) {
                     InvestmentView(gameState: gameState)
+                }
+                .sheet(isPresented: $allTransactionsSheetIsPresented) {
+                    NavigationView {
+                        List {
+                            ForEach(gameState.transactions) { transaction in
+                                TransactionView(transaction: transaction)
+                            }
+                        }
+                        .navigationTitle("All Transactions")
+                    }
                 }
             }
         }

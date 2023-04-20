@@ -259,3 +259,102 @@ class InsuranceManager {
         return premiumCost
     }
 }
+
+@available(iOS 16, *)
+class FDManager {
+    @Published var fdPurchased = false
+    @Published var fdExpiryTimestamp: Double? = nil
+    @Published var fdAmount: Double? = nil
+    @Published var fdInterestRate: Int? = nil
+    
+    init() {
+        self.fdPurchased = false
+        self.fdExpiryTimestamp = nil
+        self.fdAmount = nil
+        self.fdInterestRate = nil
+    }
+    
+    func purchaseFD(withPrincipal principal: Double, forYears years: Int, realTimeElapsed: Double) -> Transaction {
+        fdPurchased = true
+        fdExpiryTimestamp = realTimeElapsed + (Double(years * GameState.secondsInAYear) / GameState.timeLeftDeductionRatePerPointOneSecond(gameDuration: GameState.defaultGameDuration))
+        fdAmount = principal
+        fdInterestRate = FDManager.rateForFD(withPrincipal: principal, forYears: years)
+        
+        return Transaction(
+            title: "Fixed Deposit: Initial Amount",
+            type: .fd,
+            posOrNeg: .negative,
+            quantity: principal,
+            description: "You purchased a Fixed Deposit with a principal amount of \(principal.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))) for \(years) years. This is the charge on your balance for the initial amount."
+        )
+    }
+    
+    func breakFD() -> Transaction {
+        var penaltyFee: Double = 0.0
+        
+        if (fdAmount ?? 0.0) > 150000 {
+            penaltyFee = 100000
+        } else if (fdAmount ?? 0.0) > 100000 {
+            penaltyFee = 80000
+        } else {
+            penaltyFee = 15000
+        }
+        
+        return Transaction(
+            title: "Fixed Deposit: FD Break Penalty Fee",
+            type: .fd,
+            posOrNeg: .negative,
+            quantity: penaltyFee,
+            description: "You recently broke your FD. Breaking FDs cuase you to incur a penalty fee for breaking the fixed deposit before its maturity date."
+        )
+    }
+    
+    func checkForCharges(realTimeElapsed: Double) -> [Transaction] {
+        var charges: [Transaction] = []
+        
+        if fdPurchased {
+            if (fdExpiryTimestamp ?? 0.0) <= realTimeElapsed {
+                // expire fixed deposit and return profited money
+                fdPurchased = false
+                fdExpiryTimestamp = nil
+                fdInterestRate = nil
+                
+                var amount = fdAmount ?? 0.0
+                fdAmount = nil
+                charges.append(
+                    Transaction(
+                        title: "Fixed Deposit: End of Deposit Payout",
+                        type: .fd,
+                        posOrNeg: .positive,
+                        quantity: amount,
+                        description: "Your FD closed and you got your hard-grown money back into your balance! Congratulations!"
+                    )
+                )
+            } else {
+                // check if year has passed
+                let realRealTimeElapsed = realTimeElapsed * 10
+                if realRealTimeElapsed.remainder(dividingBy: 24) == 0 {
+                    // one year passed
+                    fdAmount = Double(((100 + fdInterestRate!) / 100)) * fdAmount!
+                }
+            }
+        }
+        
+        return charges
+    }
+    
+    
+    static func rateForFD(withPrincipal principal: Double, forYears years: Int) -> Int {
+        if principal > 150000 {
+            return 12
+        } else if principal > 100000 {
+            return 9
+        } else if principal > 50000 {
+            return 6
+        } else if principal > 10000 {
+            return 4
+        } else {
+            return 2
+        }
+    }
+}
