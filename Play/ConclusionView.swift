@@ -20,7 +20,7 @@ struct ConclusionView: View {
             Spacer()
             VStack {
                 Text("You " + winLoseText)
-                    .font(.largeTitle)
+                    .font(.largeTitle.weight(.black))
                     .foregroundColor(won ? .green: .red)
                     .padding(.bottom, 30)
                 Text("Thanks for playing!")
