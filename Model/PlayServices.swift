@@ -358,3 +358,171 @@ class FDManager {
         }
     }
 }
+
+enum StockTrend {
+    case upwards, downwards
+}
+
+enum StockOptions: String {
+    case iago = "Iago Inc.", aladdin = "Aladdin Co."
+}
+
+class Stock {
+    var name: String
+    var description: String
+    var sharePrice: Double
+    @Published var currentTrend: StockTrend
+    @Published var currentTrendRate: Double
+    @Published var purchased: Bool = false
+    @Published var numShares: Int? = nil
+    
+    init(name: String, description: String, sharePrice: Double, realTimeElapsed: Double) {
+        self.name = name
+        self.description = description
+        self.sharePrice = sharePrice
+        
+        var trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: name)
+        if trendRate < 0 {
+            self.currentTrend = .downwards
+        } else {
+            self.currentTrend = .upwards
+        }
+        
+        self.currentTrendRate = abs(trendRate)
+    }
+    
+    func refreshTrend(realTimeElapsed: Double, stockName: String) {
+        var trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: stockName)
+        if trendRate < 0 {
+            currentTrend = .downwards
+        } else {
+            currentTrend = .upwards
+        }
+        
+        currentTrendRate = abs(trendRate)
+    }
+    
+    static func trendForTimeElapsed(_ timeElapsed: Double, stockName stock: String) -> Double {
+        if stock == StockOptions.iago.rawValue {
+            if timeElapsed < 20 {
+                return 2.4
+            } else if timeElapsed < 40 {
+                return 5.6
+            } else if timeElapsed < 60 {
+                return 5
+            } else if timeElapsed < 100 {
+                return 7
+            } else {
+                return -3.7
+            }
+        } else if stock == StockOptions.aladdin.rawValue {
+            if timeElapsed < 20 {
+                return -3.5
+            } else if timeElapsed < 40 {
+                return -1.2
+            } else if timeElapsed < 60 {
+                return 2.8
+            } else if timeElapsed < 80 {
+                return 4.8
+            } else if timeElapsed < 110 {
+                return 7.6
+            } else {
+                return 3.6
+            }
+        } else {
+            return 0
+        }
+    }
+    
+    static func stockPriceWithRateApplied(_ rate: Double, stockPrice: Double) -> Double {
+        return ((100 + rate) / 100) * stockPrice
+    }
+}
+
+class StockManager {
+    @Published var iago: Stock
+    @Published var aladdin: Stock
+    
+    init(realTimeElapsed: Double) {
+        iago = Stock(name: StockOptions.iago.rawValue, description: "A multi-conglomerate artifical intelligence provider that powers government and corporate technologies worldwide, from ordering food to banking.", sharePrice: 3500, realTimeElapsed: realTimeElapsed)
+        aladdin = Stock(name: StockOptions.aladdin.rawValue, description: "A popular fitness e-commerce website in the United States that sells high quality fitness products marketed as luxury products in 2080.", sharePrice: 2800, realTimeElapsed: realTimeElapsed)
+    }
+    
+    func purchaseShare(ofStock stock: StockOptions, numShares: Int, realTimeElapsed: Double) -> [Transaction] {
+        var charges: [Transaction] = []
+        
+        iago.refreshTrend(realTimeElapsed: realTimeElapsed, stockName: stock.rawValue)
+        aladdin.refreshTrend(realTimeElapsed: realTimeElapsed, stockName: stock.rawValue)
+        
+        if stock == .iago {
+            iago.purchased = true
+            iago.numShares = numShares
+            
+            var amountDue = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(numShares)
+            charges.append(
+                Transaction(
+                    title: "Stock Purchase: \(stock.rawValue)",
+                    type: .stocks,
+                    posOrNeg: .negative,
+                    quantity: amountDue,
+                    description: "You purchased \(numShares) shares of \(stock.rawValue) recently."
+                )
+            )
+        } else {
+            aladdin.purchased = true
+            aladdin.numShares = numShares
+            
+            var amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(numShares)
+            charges.append(
+                Transaction(
+                    title: "Stock Purchase: \(stock.rawValue)",
+                    type: .stocks,
+                    posOrNeg: .negative,
+                    quantity: amountDue,
+                    description: "You purchased \(numShares) shares of \(stock.rawValue) recently."
+                )
+            )
+        }
+        
+        return charges
+    }
+    
+    func sellShare(ofStock stock: StockOptions, realTimeElapsed: Double) -> [Transaction] {
+        var charges: [Transaction] = []
+        
+        iago.refreshTrend(realTimeElapsed: realTimeElapsed, stockName: stock.rawValue)
+        aladdin.refreshTrend(realTimeElapsed: realTimeElapsed, stockName: stock.rawValue)
+        
+        if stock == .iago {
+            var moneyBack = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(iago.numShares ?? 1)
+            charges.append(
+                Transaction(
+                    title: "Stock Sell: \(stock.rawValue)",
+                    type: .stocks,
+                    posOrNeg: .negative,
+                    quantity: moneyBack,
+                    description: "You sold \(iago.numShares ?? 1) shares of \(stock.rawValue) recently."
+                )
+            )
+            
+            iago.purchased = false
+            iago.numShares = nil
+        } else {
+            var amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(aladdin.numShares ?? 1)
+            charges.append(
+                Transaction(
+                    title: "Stock Sell: \(stock.rawValue)",
+                    type: .stocks,
+                    posOrNeg: .negative,
+                    quantity: amountDue,
+                    description: "You sold \(aladdin.numShares ?? 1) shares of \(stock.rawValue) recently."
+                )
+            )
+            
+            aladdin.purchased = false
+            aladdin.numShares = nil
+        }
+        
+        return charges
+    }
+}
