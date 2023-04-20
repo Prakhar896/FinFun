@@ -18,6 +18,7 @@ struct ProfileSetupView: View {
     
     @FocusState var nameIsFocused: Bool
     @FocusState var expensesIsFocused: Bool
+    @FocusState var childFocused: Bool
     
     var generatedGameProfile: GameProfile {
         return GameProfile(
@@ -114,6 +115,7 @@ struct ProfileSetupView: View {
                                 TextField("Child's age here.", value: $children[childIndex].age, format: .number)
                                     .keyboardType(.numberPad)
                                     .multilineTextAlignment(.trailing)
+                                    .focused($childFocused)
                             }
                         }
                         .onDelete(perform: removeChild)
@@ -162,6 +164,7 @@ struct ProfileSetupView: View {
                         Button("Done") {
                             nameIsFocused = false
                             expensesIsFocused = false
+                            childFocused = false
                         }
                     }
                 }

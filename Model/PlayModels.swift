@@ -297,6 +297,10 @@ class GameState: ObservableObject {
 @available(iOS 16, *)
 struct WinCalculator {
     static func calculateWin(gameState: GameState) -> String {
+        if gameState.balance < 0 {
+            return "LOST ;("
+        }
+        
         var lowerRange = 0
         
         if gameState.userGameProfile.monthlySalaryInThousands == 20 {

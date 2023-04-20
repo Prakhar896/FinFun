@@ -40,6 +40,13 @@ struct LearnView: View {
                         .background(appState.currentLesson.id == lesson.id ? Color.accentColor.opacity(0.1): .clear)
                         .cornerRadius(10)
                     }
+                    
+                    Button("Reset Progress") {
+                        for lessonIndex in 0..<appState.lessons.count {
+                            appState.lessons[lessonIndex].completed = false
+                        }
+                    }
+                    .padding(.top, 50)
                 }
                 .padding(10)
             }

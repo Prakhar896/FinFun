@@ -22,20 +22,27 @@ struct ConclusionView: View {
                 Text("You " + winLoseText)
                     .font(.largeTitle)
                     .foregroundColor(won ? .green: .red)
+                    .padding(.bottom, 30)
                 Text("Thanks for playing!")
-                    .font(.title)
+                    .font(.title2)
             }
+            .padding(.bottom, 50)
+            
+            Text("I hope you enjoyed playing this little game of mine! It took a lot of effort but I think the final product is actuallly quite fun. I hope you shared the same opinion.\n\nUntil next time!")
+                .padding(.horizontal)
+                .multilineTextAlignment(.center)
             
             Spacer()
             Button {
                 pageShowing = .title
             } label: {
-                Text("Go back")
+                Text("Go Back")
                     .foregroundColor(.accentColor)
                     .padding(20)
             }
             .background(Color.accentColor.opacity(0.2))
             .cornerRadius(20)
+            Spacer()
         }
         .onAppear {
             let result = WinCalculator.calculateWin(gameState: gameState)
