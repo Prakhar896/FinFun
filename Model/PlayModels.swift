@@ -259,6 +259,9 @@ class GameState: ObservableObject {
         let fdCharges = fdManager.checkForCharges(realTimeElapsed: realTimeElapsed)
         newTransacts.append(contentsOf: fdCharges)
         
+        // Refresh stock trends
+        stockManager.refreshTrends(realTimeElapsed: realTimeElapsed)
+        
         withAnimation {
             transactions.insert(contentsOf: newTransacts, at: 0)
             applyTransactions(newTransacts)

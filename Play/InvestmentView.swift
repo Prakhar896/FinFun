@@ -167,7 +167,7 @@ struct InvestmentView: View {
                         
                         Button {
                             // action code
-                            fdPopupShowing = true
+                            stocksPopupShowing = true
                         } label: {
                             Text("Manage")
                                 .bold()
@@ -181,6 +181,7 @@ struct InvestmentView: View {
                     .padding(20)
                     .background(.ultraThinMaterial)
                 }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
             .navigationTitle("Finance Options")
         }
@@ -189,6 +190,9 @@ struct InvestmentView: View {
         })
         .sheet(isPresented: $fdPopupShowing, content: {
             FDInvestmentView(gameState: gameState, fdPopupShowing: $fdPopupShowing)
+        })
+        .sheet(isPresented: $stocksPopupShowing, content: {
+            StockInvestmentView(gameState: gameState, stockPopupShowing: $stocksPopupShowing)
         })
         .navigationTitle("Finance Options")
     }

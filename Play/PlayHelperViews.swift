@@ -297,3 +297,149 @@ struct FDInvestmentView: View {
         }
     }
 }
+
+@available(iOS 16, *)
+struct StockInvestmentView: View {
+    @ObservedObject var gameState: GameState
+    @Binding var stockPopupShowing: Bool
+    
+    @State var alertType: StockOptions = .iago
+    @State var alertPresented = false
+    @State var numShares: Int = 0
+    
+    var totalCost: Double {
+        if alertType == .iago {
+            return Double(numShares) * Stock.stockPriceWithRateApplied(gameState.stockManager.iago.currentTrendRate, stockPrice: gameState.stockManager.iago.sharePrice)
+        } else {
+            return Double(numShares) * Stock.stockPriceWithRateApplied(gameState.stockManager.aladdin.currentTrendRate, stockPrice: gameState.stockManager.aladdin.sharePrice)
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            List {
+                // Iago
+                Section {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(StockOptions.iago.rawValue)
+                                .font(.title2.weight(.heavy))
+                            if gameState.stockManager.iago.purchased {
+                                Text("\(gameState.stockManager.iago.numShares ?? 0) Shares Purchased")
+                                    .font(.subheadline)
+                            }
+                            Text(gameState.stockManager.iago.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 5) {
+                            Image(systemName: gameState.stockManager.iago.currentTrend == .upwards ? "arrowtriangle.up.fill": "arrowtriangle.down.fill")
+                            Text("\(gameState.stockManager.iago.currentTrendRate.rounded())")
+                                .font(.system(size: 17).bold())
+                        }
+                        .foregroundColor(gameState.stockManager.iago.currentTrend == .upwards ? .green: .red)
+                        
+                        Button {
+                            // buy/sell shares
+                            if gameState.stockManager.iago.purchased {
+                                // sell shares
+                                let charges = gameState.stockManager.sellShare(ofStock: .iago, realTimeElapsed: gameState.realTimeElapsed)
+                                withAnimation {
+                                    gameState.transactions.insert(contentsOf: charges, at: 0)
+                                    gameState.applyTransactions(charges)
+                                }
+                            } else {
+                                // bring up alert
+                                alertType = .iago
+                                alertPresented = true
+                            }
+                        } label: {
+                            Text(gameState.stockManager.iago.purchased ? "Sell": "Buy")
+                                .foregroundColor(gameState.stockManager.iago.purchased ? .red: .green)
+                                .padding(10)
+                                .background(gameState.stockManager.iago.purchased ? .red.opacity(0.2): .green.opacity(0.2))
+                        }
+                        .cornerRadius(10)
+                    }
+                    .padding()
+                }
+                
+                // Aladdin
+                Section {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(StockOptions.aladdin.rawValue)
+                                .font(.title2.weight(.heavy))
+                            if gameState.stockManager.aladdin.purchased {
+                                Text("\(gameState.stockManager.aladdin.numShares ?? 0) Shares Purchased")
+                                    .font(.subheadline)
+                            }
+                            Text(gameState.stockManager.aladdin.description)
+                                .font(.caption)
+                        }
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 5) {
+                            Image(systemName: gameState.stockManager.aladdin.currentTrend == .upwards ? "arrowtriangle.up.fill": "arrowtriangle.down.fill")
+                            Text("\(gameState.stockManager.aladdin.currentTrendRate.rounded())")
+                                .font(.system(size: 17).bold())
+                        }
+                        .foregroundColor(gameState.stockManager.aladdin.currentTrend == .upwards ? .green: .red)
+                        
+                        Button {
+                            // buy/sell shares
+                            if gameState.stockManager.aladdin.purchased {
+                                // sell shares
+                                let charges = gameState.stockManager.sellShare(ofStock: .aladdin, realTimeElapsed: gameState.realTimeElapsed)
+                                withAnimation {
+                                    gameState.transactions.insert(contentsOf: charges, at: 0)
+                                    gameState.applyTransactions(charges)
+                                }
+                            } else {
+                                // bring up alert
+                                alertType = .aladdin
+                                alertPresented = true
+                            }
+                        } label: {
+                            Text(gameState.stockManager.aladdin.purchased ? "Sell": "Buy")
+                                .foregroundColor(gameState.stockManager.aladdin.purchased ? .red: .green)
+                                .padding(10)
+                                .background(gameState.stockManager.aladdin.purchased ? .red.opacity(0.2): .green.opacity(0.2))
+                        }
+                        .cornerRadius(10)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Invest: Stocks")
+            .alert("Buy \(alertType.rawValue)", isPresented: $alertPresented) {
+                TextField("Number of shares", value: $numShares, format: .number)
+                Button("Cancel", role: .cancel) {}
+                
+                Button("Buy") {
+                    // actually buy shares
+                    if alertType == .iago {
+                        let charges = gameState.stockManager.purchaseShare(ofStock: .iago, numShares: numShares, realTimeElapsed: gameState.realTimeElapsed)
+                        withAnimation {
+                            gameState.transactions.insert(contentsOf: charges, at: 0)
+                            gameState.applyTransactions(charges)
+                        }
+                    } else {
+                        let charges = gameState.stockManager.purchaseShare(ofStock: .aladdin, numShares: numShares, realTimeElapsed: gameState.realTimeElapsed)
+                        withAnimation {
+                            gameState.transactions.insert(contentsOf: charges, at: 0)
+                            gameState.applyTransactions(charges)
+                        }
+                    }
+                }
+            } message: {
+                Text("You are now buying shares of \(alertType.rawValue). Enter the number of shares you would like to buy.\n\nTotal Cost: \(totalCost.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))")
+            }
+
+        }
+    }
+}

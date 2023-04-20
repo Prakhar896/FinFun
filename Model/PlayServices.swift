@@ -458,7 +458,7 @@ class StockManager {
             iago.purchased = true
             iago.numShares = numShares
             
-            var amountDue = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(numShares)
+            let amountDue = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(numShares)
             charges.append(
                 Transaction(
                     title: "Stock Purchase: \(stock.rawValue)",
@@ -472,7 +472,7 @@ class StockManager {
             aladdin.purchased = true
             aladdin.numShares = numShares
             
-            var amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(numShares)
+            let amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(numShares)
             charges.append(
                 Transaction(
                     title: "Stock Purchase: \(stock.rawValue)",
@@ -494,12 +494,12 @@ class StockManager {
         aladdin.refreshTrend(realTimeElapsed: realTimeElapsed, stockName: stock.rawValue)
         
         if stock == .iago {
-            var moneyBack = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(iago.numShares ?? 1)
+            let moneyBack = Stock.stockPriceWithRateApplied(iago.currentTrendRate, stockPrice: iago.sharePrice) * Double(iago.numShares ?? 1)
             charges.append(
                 Transaction(
                     title: "Stock Sell: \(stock.rawValue)",
                     type: .stocks,
-                    posOrNeg: .negative,
+                    posOrNeg: .positive,
                     quantity: moneyBack,
                     description: "You sold \(iago.numShares ?? 1) shares of \(stock.rawValue) recently."
                 )
@@ -508,12 +508,12 @@ class StockManager {
             iago.purchased = false
             iago.numShares = nil
         } else {
-            var amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(aladdin.numShares ?? 1)
+            let amountDue = Stock.stockPriceWithRateApplied(aladdin.currentTrendRate, stockPrice: aladdin.sharePrice) * Double(aladdin.numShares ?? 1)
             charges.append(
                 Transaction(
                     title: "Stock Sell: \(stock.rawValue)",
                     type: .stocks,
-                    posOrNeg: .negative,
+                    posOrNeg: .positive,
                     quantity: amountDue,
                     description: "You sold \(aladdin.numShares ?? 1) shares of \(stock.rawValue) recently."
                 )
@@ -524,5 +524,15 @@ class StockManager {
         }
         
         return charges
+    }
+    
+    func refreshTrends(realTimeElapsed: Double) {
+        let iagoTrend = Stock.trendForTimeElapsed(realTimeElapsed, stockName: StockOptions.iago.rawValue)
+        iago.currentTrend = iagoTrend < 0 ? .downwards: .upwards
+        iago.currentTrendRate = abs(iagoTrend)
+        
+        let aladdinTrend = Stock.trendForTimeElapsed(realTimeElapsed, stockName: StockOptions.aladdin.rawValue)
+        aladdin.currentTrend = aladdinTrend < 0 ? .downwards: .upwards
+        iago.currentTrendRate = abs(aladdinTrend)
     }
 }
