@@ -319,7 +319,7 @@ class FDManager {
                 fdExpiryTimestamp = nil
                 fdInterestRate = nil
                 
-                var amount = fdAmount ?? 0.0
+                let amount = fdAmount ?? 0.0
                 fdAmount = nil
                 charges.append(
                     Transaction(
@@ -381,7 +381,7 @@ class Stock {
         self.description = description
         self.sharePrice = sharePrice
         
-        var trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: name)
+        let trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: name)
         if trendRate < 0 {
             self.currentTrend = .downwards
         } else {
@@ -392,7 +392,7 @@ class Stock {
     }
     
     func refreshTrend(realTimeElapsed: Double, stockName: String) {
-        var trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: stockName)
+        let trendRate = Stock.trendForTimeElapsed(realTimeElapsed, stockName: stockName)
         if trendRate < 0 {
             currentTrend = .downwards
         } else {

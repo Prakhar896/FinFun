@@ -12,7 +12,7 @@ struct PlayHomeView: View {
     @StateObject var gameState: GameState
     @Binding var pageShowing: PageIdentifier
     
-    @State var showingIntro: Bool = false {
+    @State var showingIntro: Bool = true {
         didSet {
             // trigger the start of timer because intro has stopped showing and game has begun
             if showingIntro == false {

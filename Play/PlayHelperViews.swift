@@ -248,7 +248,7 @@ struct FDInvestmentView: View {
                     Button {
                         // purchase policy
                         if !gameState.fdManager.fdPurchased {
-                            var initial = gameState.fdManager.purchaseFD(withPrincipal: amount, forYears: years, realTimeElapsed: gameState.realTimeElapsed)
+                            let initial = gameState.fdManager.purchaseFD(withPrincipal: amount, forYears: years, realTimeElapsed: gameState.realTimeElapsed)
                             withAnimation {
                                 gameState.transactions.insert(initial, at: 0)
                                 gameState.applyTransactions([initial])
@@ -274,7 +274,7 @@ struct FDInvestmentView: View {
                 Button("Cancel", role: .cancel) {}
                 
                 Button("Break", role: .destructive) {
-                    var penalty = gameState.fdManager.breakFD()
+                    let penalty = gameState.fdManager.breakFD()
                     withAnimation {
                         gameState.transactions.insert(penalty, at: 0)
                         gameState.applyTransactions([penalty])

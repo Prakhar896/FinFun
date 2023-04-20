@@ -147,14 +147,14 @@ struct ProfileSetupView: View {
                 } message: {
                     Text(alertMessage)
                 }
-                .onAppear {
-                    #warning("Below code setups up a debug game profile by default for testing purposes. Remove before production.")
-                    name = "Prakhar"
-                    monthlyExpenses = 1000.0
-                    monthlySalary = .medium
-                    careerGrowth = .medium
-                    children = [Child(age: 13), Child(age: 20)]
-                }
+//                .onAppear {
+//                    #warning("Below code setups up a debug game profile by default for testing purposes. Remove before production.")
+//                    name = "Prakhar"
+//                    monthlyExpenses = 1000.0
+//                    monthlySalary = .medium
+//                    careerGrowth = .medium
+//                    children = [Child(age: 13), Child(age: 20)]
+//                }
                 .toolbar {
                     ToolbarItemGroup(placement: .keyboard) {
                         Spacer()
