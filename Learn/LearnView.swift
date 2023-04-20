@@ -42,9 +42,8 @@ struct LearnView: View {
                     }
                     
                     Button("Reset Progress") {
-                        for lessonIndex in 0..<appState.lessons.count {
-                            appState.lessons[lessonIndex].completed = false
-                        }
+                        appState.lessons = Lesson.loadDefaultLessons()
+                        appState.currentLesson = appState.lessons[0]
                     }
                     .padding(.top, 50)
                 }
