@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ProfileSetupView: View {
+    @Binding var pageShowing: PageIdentifier
+    
     @State var name: String = ""
     @State var monthlySalary: SalaryOptions = .easy
     @State var monthlyExpenses: Double = 0.0
@@ -122,7 +124,7 @@ struct ProfileSetupView: View {
                     Section {
                         NavigationLink {
                             PlayHomeView(
-                                gameState: GameState(userGameProfile: generatedGameProfile, balance: 0.0, timeLeft: GameState.defaultTimeLimit, realTimeElapsed: 0.0)
+                                gameState: GameState(userGameProfile: generatedGameProfile, balance: 0.0, timeLeft: GameState.defaultTimeLimit, realTimeElapsed: 0.0), pageShowing: $pageShowing
                             )
                             // Text("Hello World!")
                         } label: {
@@ -184,6 +186,6 @@ struct ProfileSetupView: View {
 
 struct ProfileSetupView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileSetupView()
+        ProfileSetupView(pageShowing: .constant(.play))
     }
 }

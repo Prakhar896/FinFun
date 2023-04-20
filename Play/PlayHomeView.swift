@@ -10,6 +10,7 @@ import SwiftUI
 @available(iOS 16, *)
 struct PlayHomeView: View {
     @StateObject var gameState: GameState
+    @Binding var pageShowing: PageIdentifier
     
     @State var showingIntro: Bool = false {
         didSet {
@@ -32,6 +33,7 @@ struct PlayHomeView: View {
     // Sheets
     @State var optionsSheetIsPresented = false
     @State var allTransactionsSheetIsPresented = false
+    @State var conclusionView = false
     
     var occurredLifeEvents: [LifeEvent] {
         var events: [LifeEvent] = []
@@ -211,6 +213,7 @@ struct PlayHomeView: View {
                 .alert(alertTitle, isPresented: $alertIsPresented) {
                     Button("Go To Results") {
                         // go to results screen
+                        conclusionView = true
                     }
                 } message: {
                     Text(alertMessage)
@@ -228,6 +231,9 @@ struct PlayHomeView: View {
                         .navigationTitle("All Transactions")
                     }
                 }
+                .sheet(isPresented: $conclusionView) {
+                    ConclusionView(gameState: gameState, pageShowing: $pageShowing)
+                }
             }
         }
         .navigationTitle("Play")
@@ -239,10 +245,21 @@ struct PlayHomeView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    isPaused.toggle()
-                } label: {
-                    Image(systemName: isPaused ? "play.fill": "pause.fill")
+                if !gameState.gameEnded {
+                    Button {
+                        isPaused.toggle()
+                    } label: {
+                        Image(systemName: isPaused ? "play.fill": "pause.fill")
+                    }
+                } else {
+                    Button {
+                        // go to results screen
+                        withAnimation {
+                            conclusionView = true
+                        }
+                    } label: {
+                        Text("Go To Results")
+                    }
                 }
             }
             
@@ -270,6 +287,6 @@ struct PlayHomeView: View {
 @available(iOS 16, *)
 struct PlayHomeView_Previews: PreviewProvider {
     static var previews: some View {
-        PlayHomeView(gameState: GameState(userGameProfile: GameProfile.blankGameProfile(), balance: 0.0, timeLeft: GameState.defaultTimeLimit, realTimeElapsed: 0.0))
+        PlayHomeView(gameState: GameState(userGameProfile: GameProfile.blankGameProfile(), balance: 0.0, timeLeft: GameState.defaultTimeLimit, realTimeElapsed: 0.0), pageShowing: .constant(.play))
     }
 }

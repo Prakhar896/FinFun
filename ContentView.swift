@@ -4,6 +4,7 @@ enum PageIdentifier: String {
     case title = "Title", learn = "Learn", play = "Play"
 }
 
+@available(iOS 16, *)
 struct ContentView: View {
     @StateObject var appState = AppState()
     @State var pageShowing: PageIdentifier = .play
@@ -24,7 +25,7 @@ struct ContentView: View {
                     }
                 }
         case .play:
-            ProfileSetupView()
+            ProfileSetupView(pageShowing: $pageShowing)
 //        default:
 //            Text("Oops! Looks like you are caught in the middle of nowhere!\nPlease restart the app.")
         }

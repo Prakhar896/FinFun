@@ -293,3 +293,24 @@ class GameState: ObservableObject {
     static let secondsInAYear = 365 * 24 * 60 * 60
     static let secondsInAMonth = 30.42 * 24 * 60 * 60
 }
+
+@available(iOS 16, *)
+struct WinCalculator {
+    static func calculateWin(gameState: GameState) -> String {
+        var lowerRange = 0
+        
+        if gameState.userGameProfile.monthlySalaryInThousands == 20 {
+            lowerRange = 10000000
+        } else if gameState.userGameProfile.monthlySalaryInThousands == 10 {
+            lowerRange = 1000000
+        } else {
+            lowerRange = 100000
+        }
+        
+        if gameState.balance >= Double(lowerRange) {
+            return "WON!"
+        } else {
+            return "LOST ;("
+        }
+    }
+}
