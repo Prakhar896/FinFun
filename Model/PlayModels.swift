@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 enum SalaryOptions: String {
-    case hard = "$10K (Hard)", medium = "$25K (Medium)", easy = "$50K (Easy)"
+    case hard = "$5K (Hard)", medium = "$10K (Medium)", easy = "$20K (Easy)"
 }
 
 enum CareerGrowthOptions: String {
@@ -49,11 +49,11 @@ struct GameProfile {
     static func salaryForOption(_ option: SalaryOptions) -> Int {
         switch option {
         case .easy:
-            return 50
+            return 20
         case .medium:
-            return 25
-        case .hard:
             return 10
+        case .hard:
+            return 5
         }
     }
     
